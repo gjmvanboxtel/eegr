@@ -5,7 +5,7 @@
 \title{Topographic Plot}
 \usage{
 topoplot(x, sl, res = 200, scale = "auto", plot = c("sensorlocs",
-  "legend", "contour", "labels", "all"), ...)
+  "legend"), ...)
 }
 \arguments{
 \item{x}{Numeric array (coerced). The data to be interpolated and plotted. The number of data points should
@@ -61,8 +61,10 @@ function, and only important for users who want to work with the underlying code
 data <- ReadEDF ("yourfile")
 sensors <- getLocationsfromLabels(labels = data$head$label)
 opar <- par(xpd=NA, mfrow=c(1,2));
-ret <- topoplot (data$ctd[200,], sensors, scale = c(-10, 10), plot = c("contour","sensorlocs"), main="Plot1");
-ret <- topoplot (data$ctd[400,], sensors, scale = c(-10, 10), plot = c("contour","sensorlocs"), main="Plot2");
+ret <- topoplot (data$ctd[200,], sensors, scale = c(-10, 10),
+       plot = c("contour","sensorlocs"), main="Plot1");
+ret <- topoplot (data$ctd[400,], sensors, scale = c(-10, 10),
+      plot = c("contour","sensorlocs"), main="Plot2");
 usr <- par("usr")
 plotrix::color.legend(xl = usr[2], yb = (usr[3] + 23), xr = (usr[2] + 23), yt = (usr[4] - 23)
                       rect.col = rev(rainbow(250,start=0,end=.7)),

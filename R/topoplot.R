@@ -56,8 +56,10 @@
 #' data <- ReadEDF ("yourfile")
 #' sensors <- getLocationsfromLabels(labels = data$head$label)
 #' opar <- par(xpd=NA, mfrow=c(1,2));
-#' ret <- topoplot (data$ctd[200,], sensors, scale = c(-10, 10), plot = c("contour","sensorlocs"), main="Plot1");
-#' ret <- topoplot (data$ctd[400,], sensors, scale = c(-10, 10), plot = c("contour","sensorlocs"), main="Plot2");
+#' ret <- topoplot (data$ctd[200,], sensors, scale = c(-10, 10),
+#'        plot = c("contour","sensorlocs"), main="Plot1");
+#' ret <- topoplot (data$ctd[400,], sensors, scale = c(-10, 10),
+#'       plot = c("contour","sensorlocs"), main="Plot2");
 #' usr <- par("usr")
 #' plotrix::color.legend(xl = usr[2], yb = (usr[3] + 23), xr = (usr[2] + 23), yt = (usr[4] - 23)
 #'                       rect.col = rev(rainbow(250,start=0,end=.7)),
@@ -94,6 +96,7 @@
 #' @importFrom graphics par image segments text image contour
 #' @importFrom plotrix draw.circle
 #' @importFrom sspline smooth.sspline predict.smooth.sspline
+#' @importFrom grDevices rainbow
 #' @export
 
 
@@ -147,7 +150,7 @@ topoplot <- function (x, sl, res = 200, scale = "auto", plot = c("sensorlocs", "
   
   # square plot using 'image', no axes, rainbow colors
   graphics::image(iplat, iplon, pred, axes = FALSE, xlim=c(-200, 200), ylim = c(-200, 200), zlim=zlim, 
-                  xlab = "", ylab = "", col = rev(rainbow(250, start=0, end=.7)), ...)
+                  xlab = "", ylab = "", col = rev(grDevices::rainbow(250, start=0, end=.7)), ...)
 
   #contour requested? compute range and define range/5 contour levels
   if ("contour" %in% plot || "all" %in% plot) {
@@ -188,7 +191,7 @@ topoplot <- function (x, sl, res = 200, scale = "auto", plot = c("sensorlocs", "
   if ("legend" %in% plot || "all" %in% plot) {
     usr <- par("usr")
     plotrix::color.legend(xl = usr[2], yb = (usr[3] + 23), xr = (usr[2] + 23), yt = (usr[4] - 23),
-                          rect.col = rev(rainbow(250, start = 0, end = .7)),
+                          rect.col = rev(grDevices::rainbow(250, start = 0, end = .7)),
                           gradient = "y", align = "rb",
                           legend = sprintf("%+2.0f", seq(zlim[1], zlim[2], length = 5))
                           )

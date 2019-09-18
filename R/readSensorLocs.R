@@ -23,7 +23,6 @@
 # 20190912    GvB           version for eegr v0.1.0
 #---------------------------------------------------------------------------------------------------------------------
 
-
 #' readSensorLocs
 #'
 #' Read sensor locations from an external file or select locations from a data frame.
@@ -425,7 +424,7 @@ readSensorLocs <- function (source = 'EEGlocations',
   # Make plot if requested
   if (is.logical(plot)) {
     if (plot) plot (sens)
-  } else if (is.character.plot) {
+  } else if (is.character(plot)) {
     ss <- subset(sens, label %in% plot)
     plot(ss)
   } else stop (paste("invalid 'plot' value:", plot))
