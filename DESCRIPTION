@@ -1,0 +1,13 @@
+Package: eegr
+Type: Package
+Title: Electrophysiological data analysis
+Version: 0.1.0
+Date: 2019-09-18
+Author: Geert van Boxtel
+Maintainer: Geert van Boxtel <G.J.M.vanBoxtel@gmail.com>
+Description: Eegr is R-based software for processing continuous or event-related EEG or other physiological data.
+License: GPL-2
+Encoding: UTF-8
+Depends: stats, graphics, plotrix, utils, mmap, signal, sspline
+LazyData: true
+RoxygenNote: 6.1.1
