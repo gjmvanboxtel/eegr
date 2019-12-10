@@ -4,9 +4,13 @@
 \alias{readEDF}
 \title{readEDF}
 \usage{
-readEDF(file, records = "all", signals = "all",
+readEDF(
+  file,
+  records = "all",
+  signals = "all",
   multifreq = c("group", "separate", "downsample", "upsample"),
-  physical = TRUE)
+  physical = TRUE
+)
 }
 \arguments{
 \item{file}{Character string. The name of the file which the data are to be read from. \code{file} 
@@ -116,7 +120,7 @@ Format (EDF) or its variants.
 EDF was published in 1992 and stores multichannel data, allowing different sample rates for each signal.
 Internally it includes a header and one or more data records. The header contains some general information 
 (patient identification, start time...) and technical specs of each signal (calibration, sampling rate, filtering, ...),
-coded as ASCII characters. The data records contain samples as little-endian 16-bit integers.
+coded as ASCII characters. The data records contain samples as little-endian 16-bit integers. 
 
 EDF+ was published in 2003 and is largely compatible to EDF, but EDF+ files also allow coding discontinuous recordings
 as well as annotations, stimuli and events in UTF-8 format.

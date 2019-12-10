@@ -37,8 +37,7 @@ fs(object) <- value
 
 \method{print}{summary.ctd}(x, ...)
 
-\method{plot}{ctd}(x, sensors = 1:ns(x), xlim = c(0, 10),
-  ylim = c(-50, 50), ...)
+\method{plot}{ctd}(x, sensors = 1:ns(x), xlim = c(0, 10), ylim = c(-50, 50), ...)
 }
 \arguments{
 \item{x}{name of a matrix that contains the data, or an object that can be coerced to a matrix,

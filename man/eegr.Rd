@@ -3,7 +3,6 @@
 \docType{package}
 \name{eegr}
 \alias{eegr}
-\alias{eegr-package}
 \title{eegr: A package for processing eeg data.}
 \description{
 The \code{eegr} package provides functions to process continuous or event-related electroencephalographic (EEG) or other

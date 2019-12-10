@@ -5,9 +5,13 @@
 \alias{getLocationsfromLabels}
 \title{readSensorLocs}
 \usage{
-readSensorLocs(source = "EEGlocations", type = c("besa", "elp",
-  "eeglab", "xyz", "custom"), format = "", select = "all",
-  plot = FALSE)
+readSensorLocs(
+  source = "EEGlocations",
+  type = c("besa", "elp", "eeglab", "xyz", "custom"),
+  format = "",
+  select = "all",
+  plot = FALSE
+)
 
 getLocationsfromLabels(labels, plot = FALSE)
 }

@@ -431,6 +431,8 @@ readEDF <- function (file, records = "all", signals = "all",
     getTALs <- function (chan, sf) {
       TALs <- NULL
       start0 <- which(chan == 0x2b | chan == 0x2d)     #TAL starts with '+' or '-'
+      # bugfix 20191210
+      if (length(start0) == 0) return(NULL)
       start1 <- start0 - 1                             #preceded by 0x00
       if (start0[1] == 1) start <- c(1, start0[2:length(start0)][which(chan[start1] == 0)])
       else start <- start0[which(chan[start1] == 0)]

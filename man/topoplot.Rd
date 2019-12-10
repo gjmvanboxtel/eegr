@@ -4,8 +4,14 @@
 \alias{topoplot}
 \title{Topographic Plot}
 \usage{
-topoplot(x, sl, res = 200, scale = "auto", plot = c("sensorlocs",
-  "legend"), ...)
+topoplot(
+  x,
+  sl,
+  res = 200,
+  scale = "auto",
+  plot = c("sensorlocs", "legend"),
+  ...
+)
 }
 \arguments{
 \item{x}{Numeric array (coerced). The data to be interpolated and plotted. The number of data points should
