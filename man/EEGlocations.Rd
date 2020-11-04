@@ -4,7 +4,8 @@
 \name{EEGlocations}
 \alias{EEGlocations}
 \title{EEGlocations}
-\format{A data frame with 356 rows and 8 columns:
+\format{
+A data frame with 356 rows and 8 columns:
 \describe{
   \item{label}{(\code{factor}) electrode label according to the 10-5 system, e.g., "AF1", "P3", etc.}
   \item{x}{(\code{numeric}) Cartesian x-axis (left-to-right) value}
@@ -14,7 +15,8 @@
   \item{y2d}{(\code{numeric}) y-axis value of orthogonal projection onto 2D plane}
   \item{theta}{(\code{numeric}) angle between 3D z-axis and x/y plane}
   \item{phi}{(\code{numeric}) angle between x- and y-axes}
-}}
+}
+}
 \usage{
 EEGlocations
 }

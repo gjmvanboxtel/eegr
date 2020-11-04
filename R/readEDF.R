@@ -20,6 +20,7 @@
 # Version history:
 # 20120207  GvB     Original version
 # 20190701  GvB     complete overhaul for eegr v0.1.0
+# 20201104  GvB     lik to gsignal instead of signal package
 #
 #-----------------------------------------------------------------------------------------------
 
@@ -76,7 +77,7 @@
 #'   \item{\code{"downsample"}}{Signals with higher sampling frequencies are downsampled to the lowest frequency in the file}
 #'   \item{\code{"upsample"}}{Signals with lower sampling frequencies are upsampled to the highest frequency in the file}
 #' }
-#' Up- and downsampling are performed by the \code{resample} function in the \code{\link{signal}} package. Note that this can 
+#' Up- and downsampling are performed by the \code{resample} function in the \code{\link{gsignal}} package. Note that this can 
 #' take a lot of time, especially in case of upsampling to the frequency of the annotation signal (usually 1-2 kHz).
 #' @param physical Logical. If true, convert the digital data values to physical values. \eqn{physval = gain * digival + offset},
 #' where \eqn{gain = (physmax - physmin) / (digimax - digimin)}, and \eqn{offset = physmax - gain * digimax}. See the description
@@ -154,7 +155,7 @@
 #'   header
 #' }
 #' @importFrom mmap mmap munmap int16 int24 char
-#' @importFrom signal resample
+#' @importFrom gsignal resample
 #' @export
 
 
@@ -300,9 +301,9 @@ readEDF <- function (file, records = "all", signals = "all",
 
   # Map the temporary file into memory, either as 24-bit int or as 16-bit int
   if (size == 3) {
-    smp <- mmap::mmap(tmpf, mode=int24())
+    smp <- mmap::mmap(tmpf, mode=mmap::int24())
   } else {
-    smp <- mmap::mmap(tmpf, mode=int16())
+    smp <- mmap::mmap(tmpf, mode=mmap::int16())
   }
 
   recsize <- sum(nsamp)                         # total record size including the signals we do not want to read
@@ -398,7 +399,7 @@ readEDF <- function (file, records = "all", signals = "all",
     mtx <- matrix(0, nrow = newf * duration * length(records), ncol = length(signals))
     col <- 1
     for (s in signals) {
-      if (freq[s] != newf) mtx[, col] <- signal::resample(dat[[s]], newf, freq[s])
+      if (freq[s] != newf) mtx[, col] <- gsignal::resample(dat[[s]], newf, freq[s])
       else mtx[, col] <- dat[[s]]
       col <- col + 1
     }
@@ -463,7 +464,7 @@ readEDF <- function (file, records = "all", signals = "all",
     annosig <- which(m > 0)
     sig <- anno <- list()
     if (!is.null(annosig)) {
-      smp <- mmap::mmap(tmpf, mode=char())
+      smp <- mmap::mmap(tmpf, mode=mmap::char())
       for (s in seq_along(annosig)) {
         sig[[s]] <- raw(length = size * length(records) * nsamp[annosig[s]])
         ptr <- 1

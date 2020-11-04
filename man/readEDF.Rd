@@ -38,7 +38,7 @@ present in the file. Options are:
   \item{\code{"downsample"}}{Signals with higher sampling frequencies are downsampled to the lowest frequency in the file}
   \item{\code{"upsample"}}{Signals with lower sampling frequencies are upsampled to the highest frequency in the file}
 }
-Up- and downsampling are performed by the \code{resample} function in the \code{\link{signal}} package. Note that this can 
+Up- and downsampling are performed by the \code{resample} function in the \code{\link{gsignal}} package. Note that this can 
 take a lot of time, especially in case of upsampling to the frequency of the annotation signal (usually 1-2 kHz).}
 
 \item{physical}{Logical. If true, convert the digital data values to physical values. \eqn{physval = gain * digival + offset},
