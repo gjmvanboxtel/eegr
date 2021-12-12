@@ -1,52 +1,54 @@
 # readSensorLocs.R
 # Read sensor locations from an external file or data frame.
-# Copyright (C) 2016, 2019  Geert van Boxtel,
-# Tilburg University, G.J.M.vBoxtel@tilburguniversity.edu
+# Copyright (C) 2020  Geert van Boxtel, <G.J.M.vanBoxtel@gmail.com>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-#
+# 
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# See also: http://www.gnu.org/licenses/gpl-2.0.txt
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # Version history:
 # 20160622    GvB           initial version
 # 20190912    GvB           version for eegr v0.1.0
 #---------------------------------------------------------------------------------------------------------------------
 
-#' readSensorLocs
+#' Read Sensor Locations
 #'
-#' Read sensor locations from an external file or select locations from a data frame.
+#' Read sensor locations from an external file or select locations from a data
+#' frame.
 #'
-#' The function \code{readSensorLocs} reads sensor coordinates from a variety of input sources.
-#' Some well-known file types are supported, such as BESA spherical coordinates, and
-#' EEGLAB and Polhemus Cartesian coordinates. These coordinate systems are converted
-#' by this function to the coordinate system used by \code{eegr} (see \code{\link{sensorlocs}}).
+#' The function \code{readSensorLocs} reads sensor coordinates from a variety of
+#' input sources. Some well-known file types are supported, such as BESA
+#' spherical coordinates, and EEGLAB and Polhemus Cartesian coordinates. These
+#' coordinate systems are converted by this function to the coordinate system
+#' used by \code{eegr} (see \code{\link{sensorlocs}}).
 #' 
-#' Alternatively, a \code{data.frame} may be specified as the source. This may be useful if standard sensor
-#' locations are used, of which a particular experiment uses a selection (see the \code{select} parameter).
+#' Alternatively, a \code{data.frame} may be specified as the source. This may
+#' be useful if standard sensor locations are used, of which a particular
+#' experiment uses a selection (see the \code{select} parameter).
 #' 
-#' In addition, sensor locations may be read from an external file with a custom format.
-#' In this case (\code{type = 'custom'}), the function expects a format string that specifies
-#' the coordinates (see the \code{format} argument).
+#' In addition, sensor locations may be read from an external file with a custom
+#' format. In this case (\code{type = 'custom'}), the function expects a format
+#' string that specifies the coordinates (see the \code{format} argument).
 #' 
-#' @param source Character string. The source file or data frame containing the sensor location coordinates.
-#' \code{source} can also be a complete URL. (For the supported URL schemes, see the ‘URLs’ section of the help
-#' for \code{url}). Alternatively, source may be an object of class \code{\link{sensorlocs}} or a 
-#' compatible data frame from which sensor locations may be selected.\cr
-#' Default: \code{EEGlocations}, the \code{sensorlocs} object that comes with \code{eegr}.
-#' 
-#' @param type Character string, only used if \code{source} denotes a filename. \code{type} describes the type of
-#' file that the sensor locations are read from. Can be any of:
+#' @param source Character string. The source file or data frame containing the
+#'   sensor location coordinates. \code{source} can also be a complete URL. (For
+#'   the supported URL schemes, see the ‘URLs’ section of the help for
+#'   \code{url}). Alternatively, source may be an object of class
+#'   \code{\link{sensorlocs}} or a compatible data frame from which sensor
+#'   locations may be selected.\cr Default: \code{EEGlocations}, the
+#'   \code{sensorlocs} object that comes with \code{eegr}.
+#' @param type Character string, only used if \code{source} denotes a filename.
+#'   \code{type} describes the type of file that the sensor locations are read
+#'   from. Can be any of:
 #' \describe{
 #'   \item{besa}{BESA spherical coordinates (3,4, or columns)}
 #'   \item{elp}{alias for \code{besa}}
@@ -54,28 +56,33 @@
 #'   \item{xyz}{Cartesian Polhemus coordinates}
 #'   \item{custom}{custom input type, see the \code{format} parameter}
 #' }
-#' 
-#' @param format Character string. Format of data to read when using a \code{custom} source type.
-#' The format string should consist of keyword-expression combinations of the form \code{keyword = (expr)}.
-#' The keyword-expression combinations recognized are:
+#' @param format Character string. Format of data to read when using a
+#'   \code{custom} source type. The format string should consist of
+#'   keyword-expression combinations of the form \code{keyword = (expr)}. The
+#'   keyword-expression combinations recognized are:
 #' \describe{
-#'   \item{\code{vars = (var1, var2, ...)}}{The variables to read from the file. Variables can be either label, theta,
-#'    phi, x, y, z, or dummy, separated by commas. The variables should at least contain either theta and phi, or
-#'    x, y, and z. A label is not required, but recognized.}
-#'   \item{\code{adjust = (expr, expr, ...)}}{used for adjusting \code{vars}. \code{expr} is either an expression
-#'    applied to the value read (e.g., '*-1'), or NULL. There should be just as many expressions as there are \code{vars}.}
-#'  \item{\code{skiplines = (x)}}{number of header lines to skip}
+#'   \item{\code{vars = (var1, var2, ...)}}{The variables to read from the file.
+#'   Variables can be either label, theta, phi, x, y, z, or dummy, separated by
+#'   commas. The variables should at least contain either theta and phi, or x,
+#'   y, and z. A label is not required, but recognized.}
+#'   \item{\code{adjust = (expr, expr, ...)}}{used for adjusting \code{vars}.
+#'   \code{expr} is either an expression applied to the value read (e.g.,
+#'   '*-1'), or NULL. There should be just as many expressions as there are
+#'   \code{vars}.}
+#'   \item{\code{skiplines = (x)}}{number of header lines to skip}
 #' }
-#' Example: \code{format='vars = (theta, phi, label),}\cr
+#' For example: \code{format='vars = (theta, phi, label),}\cr
 #' \code{adjust = (*90/72, NULL, NULL), skip = (2)'}
-#' 
-#' @param select Numeric or character vector, only used if \code{source} denotes a data frame. Specify '\code{all}' (default)
-#' to select all sensors from the \code{source} data frame. Alternatively, a character vector indicating the labels of the
-#' sensors to be selected (a variable named \code{label} should then be present in the data frame), or a numeric vector
-#' specifying the rows from the data frame to be selected.
-#' 
-#' @param plot logical, default: FALSE. If \code{TRUE}, make a 2D plot of all sensor locations (top view, nose pointing upward).
-#' Alternatively \code{plot} may be an array of character strings denoting the sensor labels to plot.
+#' @param select Numeric or character vector, only used if \code{source} denotes
+#'   a data frame. Specify '\code{all}' (default) to select all sensors from the
+#'   \code{source} data frame. Alternatively, a character vector indicating the
+#'   labels of the sensors to be selected (a variable named \code{label} should
+#'   then be present in the data frame), or a numeric vector specifying the rows
+#'   from the data frame to be selected.
+#' @param plot logical, default: FALSE. If \code{TRUE}, make a 2D plot of all
+#'   sensor locations (top view, nose pointing upward). Alternatively
+#'   \code{plot} may be an array of character strings denoting the sensor labels
+#'   to plot.
 #' 
 #' @examples 
 #' \dontrun{
@@ -84,13 +91,13 @@
 #'   readSensorLocs (source = '/somestrangeformat.txt', type = 'custom',
 #'                format='vars = (theta, phi, dummy), adjust=(*90/72, NULL, NULL), skip = (2)')
 #' }
-#' @return A data frame of class \code{\link{sensorlocs}} containing x, y, z, x2d, y2d, theta, phi
-#' in the eegr internal format. Other variables in the input data frame or matrix are copied unchanged to the outpuut data frame.
 #' 
-#' @author Geert van Boxtel, \email{G.J.M.vanBoxtel@@gmail.com}. Please note that I have just implemented some electrode
-#' location files that I encountered. I could use help in making this function more general.
+#' @return A data frame of class \code{\link{sensorlocs}} containing x, y, z,
+#'   x2d, y2d, theta, phi in the eegr internal format. Other variables in the
+#'   input data frame or matrix are copied unchanged to the outpuut data frame.
+#' 
+#' @author Geert van Boxtel, \email{G.J.M.vanBoxtel@@gmail.com}.
 #'
-#' @importFrom utils read.table 
 #' @rdname readSensorLocs
 #' @export
 
@@ -123,7 +130,7 @@ readSensorLocs <- function (source = 'EEGlocations',
   # if source is a data.frame, then we should have a select argument (character or numeric)
   if (df) {
     if (missing(select) || is.null(select) ||
-        select == '' || length(select) == 0 || length(remsp(select)) == 0 ||
+        length(select) == 0 || length(remsp(select)) == 0 ||
         (!is.character(select) && !is.numeric(select))) {
       stop(paste("Invalid 'select' variable: ", select))
     }

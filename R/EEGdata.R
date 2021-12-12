@@ -1,4 +1,4 @@
-# data.R - define object and methods for 'ctd'
+# EEGdata.R
 # Copyright (C) 2020  Geert van Boxtel, <G.J.M.vanBoxtel@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,24 +15,29 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # Version history
-# 20190918  GvB       Setup for eegr 0.1.0
-# 20201224  GvB       Documentation adapted for v0.3-0
+# 20201229  GvB       Initial setup (v0.3-0)
 #---------------------------------------------------------------------------------------------------------------------
 
-#' eegr: A package for processing eeg data.
+#' EEGdata
 #'
-#' The \code{eegr} package provides functions to process continuous or
-#' event-related electroencephalographic (EEG) or other psychophysiological
-#' data.
-#' 
-#' The most common file format for the storage of psychophysiological data is
-#' EDF/BDF, and this package contains the function \code{readEDF} to read data
-#' from files using this format.
-#' 
-#' @section to be added
-#' 
-#' @section another section
+#' Sample EEG, EOG, EMG, ECG and respiration data.
 #' 
 #' @author Geert van Boxtel, \email{G.J.M.vanBoxtel@@gmail.com}
+#' 
+#' @examples
+#' data(EEGdata)
+#' plot(EEGdata)
+#' 
+#' @format A \code{ctd} object with 30 seconds of data sampled at 200 Hz
+#'   containing the following signals, all measured in microvolts, except
+#'   respiration:
+#' \describe{
+#'   \item{AF7 ... O2}{28 EEG channels, referenced to M1 (left mastoid)}
+#'   \item{M2}{right mastoid,referenced to M1}
+#'   \item{EOGh, EOGl, EOGr}{bipolar horizontal and vertical left and right EOG channels}
+#'   \item{Resp}{Respiration measured by a chest belt (arbitrary units)}
+#'   \item{ECG}{Electrocardiogram}
+#'   \item{AgL, AgR}{Agonist and Antagonist EMG activity (finger flexion and extension)}
+#' }
 #'
-"_PACKAGE"
+"EEGdata"

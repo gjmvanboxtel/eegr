@@ -1,0 +1,52 @@
+20211212 v0.3-1
+- bugfix in readEDF()
+
+20210602 v0.3-0
+- use Akima spherical splines in topoplot()
+
+
+todo: filter/detrend rereference, segmentation, eogest, eogcor, artefacts, single ttrial plotting etc.
+- added changefs(), selectdata(), filterdata(), detrenddata(), 
+- added sample dataset EEGdata
+- topoplot: check for missing values in x (produced error in predict.smooth.sspline)
+- topoplot: repaired bug that plotted no sensorlocs
+- ctd: functions fs(), ns(), npts() return numeric value, not num [1(1d)]
+- consistent use of GPLv3
+- replaced signal by gsignal
+
+0.1.1 10-dec-2019
+Bugfix readEDF(), error reading empty annotation channel
+
+0.1.0 18-sep-2019
+New setup for distribution on Github
+Functions:
+- ctd - object and methods
+- sensorlocs - object and methods
+- readSensorLocs
+- eeglocations data set 
+- readEDF
+- topoplot
+
+0.0.5
+- create eegr_utils.R
+- move function unfactor (sensorlocs.default) to eegr_utils.R
+- reset plotting parameters in plot.sensorlocs
+- define functions taper, 
+- add tests for taper, spectrum
+
+0.0.4 06-jul-2016
+- bugfix get.sensorlocs.labels
+- define method plot.ctd.data
+
+0.0.2 26-jun-2016
+- add EEGlocations data
+- define object and methods for sensorlocs
+  = default, plot (requires plotrix library), get.sensorlocs.labels
+- define function readsensors
+
+
+0.0.1 09-jun-2016
+- define object and methods for ctd.data
+  = default, print, summary, print.summary
+- define function readbdf (requires mmap library)
+

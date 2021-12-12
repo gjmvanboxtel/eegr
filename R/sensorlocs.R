@@ -1,22 +1,16 @@
 # sensorlocs.R
 # define object and methods for sensorlocs (sensor locations)
-# Copyright (C) 2019  Geert van Boxtel,
-# Tilburg University, G.J.M.vBoxtel@tilburguniversity.edu
+# Copyright (C) 2020  Geert van Boxtel, <G.J.M.vanBoxtel@gmail.com>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# See also: http://www.gnu.org/licenses/gpl-2.0.txt
 #
 # Version history
 # 20160622  GvB       Initial version
@@ -26,27 +20,30 @@
 
 #' Sensor locations
 #' 
-#' Define the \code{sensorlocs} object and associated methods
+#' Define the \code{sensorlocs} object and associated methods.
 #' 
-#' A \code{\link{sensorlocs}} object is a \code{\link{data.frame}} containing sensor locations that can
-#' be used in further analyses or display. In order to match R's plotting functions,
-#' the coordinate system used in \code{eegr} models the head as a perfect sphere with a
-#' radius of 1 and the origin in the middle of the head (0,0,0), between the left and right pre-auricular fossae,
-#' and the line between teh nasion and inion (Towle et al, 1993). Sensor labels are as per the 10-5 electrode
-#' positioning system (Oostenveld & Praamstra, )
+#' A \code{\link{sensorlocs}} object is a \code{\link{data.frame}} containing
+#' sensor locations that can be used in further analyses or display. In order to
+#' match R's plotting functions, the coordinate system used in \code{eegr}
+#' models the head as a perfect sphere with a radius of 1 and the origin in the
+#' middle of the head (0,0,0), between the left and right pre-auricular fossae,
+#' and the line between teh nasion and inion (Towle et al, 1993). Sensor labels
+#' are as per the 10-5 electrode positioning system (Oostenveld & Praamstra, )
 #' 
 #' Within this system, Cartesian coordinates are defined along the following axes:
 #' \describe{
-#'   \item{x}{the X-axis points from the left (-) to right (+) pre-auricular points,
-#'    i.e., positive values of x refer to sensors over the right hemisphere, whereas
-#'    negative values of x refer to sensors over the left hemisphere.}
-#'   \item{y}{the Y-axis points from the back of the head (inion, -) to the front
-#'   (nasion, +), i.e., positive values of y refer to sensors over the anterior part
-#'   of the brain, whereas negative values of y refer to sensors over the posterior
-#'   part of the brain.}
-#'   \item{z}{the Z-axis point from the bottom of the head (-) to the top (+) of body,
-#'    i.e., positive values of z refer to sensors above the center of the head,
-#'    whereas negative values of z refer to sensors below the center of the head.}
+#'   \item{x}{the X-axis points from the left (-) to right (+) pre-auricular
+#'   points, i.e., positive values of x refer to sensors over the right
+#'   hemisphere, whereas negative values of x refer to sensors over the left
+#'   hemisphere.}
+#'   \item{y}{the Y-axis points from the back of the head (inion, -) to the
+#'   front (nasion, +), i.e., positive values of y refer to sensors over the
+#'   anterior part of the brain, whereas negative values of y refer to sensors
+#'   over the posterior part of the brain.}
+#'   \item{z}{the Z-axis point from the bottom of the head (-) to the top (+) of
+#'   body, i.e., positive values of z refer to sensors above the center of the
+#'   head, whereas negative values of z refer to sensors below the center of the
+#'   head.}
 #' }
 #' Angular coordinates are defined as follows:
 #' \describe{
@@ -57,38 +54,46 @@
 #'   indicating counterclockwise rotation and negative values clockwise.}
 #' }
 #' 
-#' @references Oostenveld, R., Praamstra, P., 2001. The five percent electrode system for
-#' high-resolution EEG and ERP measurements. Clin. Neurophysiol. 112, 713-719.
-#' @references Towle, V.L., et al. (1993). The spatial location of EEG electrodes: locating the
-#' best-fitting sphere relative to cortical anatomy. Electroencephal. Clin Neurophysiol. 86, 1-6.
+#' @references Oostenveld, R., Praamstra, P., 2001. The five percent electrode
+#'   system for high-resolution EEG and ERP measurements. Clin. Neurophysiol.
+#'   112, 713-719.
+#' @references Towle, V.L., et al. (1993). The spatial location of EEG
+#'   electrodes: locating the best-fitting sphere relative to cortical anatomy.
+#'   Electroencephal. Clin Neurophysiol. 86, 1-6.
 #' 
-#' @author Geert van Boxtel <\email{G.J.M.vanBoxtel@@gmail.com}
-#' @param x The input data, either a data frame or a matrix (coerced to data frame).
-#' It should either contain the variables x, y, z or theta and phi. The coordinates should already be
-#' in the eegr coordinate system, i.e., no conversion is done.
+#' @author Geert van Boxtel, \email{G.J.M.vanBoxtel@@gmail.com}
+#' 
+#' @param x The input data, either a data frame or a matrix (coerced to data
+#'   frame). It should either contain the variables x, y, z or theta and phi.
+#'   The coordinates should already be in the eegr coordinate system, i.e., no
+#'   conversion is done.
 #' 
 #' @rdname sensorlocs
-#' @export sensorlocs
+#' @export
 
 sensorlocs <- function (x, ...) UseMethod ("sensorlocs")
 
-#' @return a data frame of class 'sensorlocs' containing at least the variables x, y, z, x2d, y2d, theta, phi
-#' as per the eegr internal format described above. Other variables in the input data frame or matrix
-#' are copied unchanged to the output data frame. If a \code{label} variable was absent from the input \code{x},
-#' then labels will be added based on the minimum spherical distance with electrodes in the
-#' \code{EEGlocations} dataset. \cr\cr
-#' The calculation of the distance is based on the 'great circle distance' often used in Earth distance calculations. 
-#' For further information see \url{https://en.wikipedia.org/wiki/Great-circle_distance}. There are 3 methods
-#' often used to compute the great circle distance, the law of cosines, the haversine formula, and the Vincenty formula.
-#' The latter is most accurate for small distances and is used in this function.
+#' @return a data frame of class \code{'sensorlocs'} containing at least the
+#'   variables x, y, z, x2d, y2d, theta, phi as per the eegr internal format
+#'   described above. Other variables in the input data frame or matrix are
+#'   copied unchanged to the output data frame. If a \code{label} variable was
+#'   absent from the input \code{x}, then labels will be added based on the
+#'   minimum spherical distance with electrodes in the \code{EEGlocations}
+#'   dataset.
+#'   
+#' The calculation of the distance is based on the 'great circle distance' often
+#' used in Earth distance calculations. For further information see
+#' \url{https://en.wikipedia.org/wiki/Great-circle_distance}. There are 3
+#' methods often used to compute the great circle distance, the law of cosines,
+#' the haversine formula, and the Vincenty formula. The latter is most accurate
+#' for small distances and is used in this function.
 #' 
-#' @references  Vincenty, T. (1975). Direct and Inverse Solutions of Geodesics on the Ellipsoid with Application of 
-#' Nested Equations. Survey Review. Kingston Road, Tolworth, Surrey: Directorate of Overseas Surveys. 23 (176): 88–93.
-#' doi: \url{https://dx.doi.org/10.1179/sre.1975.23.176.88}.
+#' @references  Vincenty, T. (1975). Direct and Inverse Solutions of Geodesics
+#'   on the Ellipsoid with Application of Nested Equations. Survey Review.
+#'   Kingston Road, Tolworth, Surrey: Directorate of Overseas Surveys. 23 (176):
+#'   88–93. doi: \url{https://dx.doi.org/10.1179/sre.1975.23.176.88}.
 #' 
 #' @rdname sensorlocs
-#' @importFrom graphics par plot segments text
-#' @importFrom plotrix draw.circle
 #' @export
 
 sensorlocs.default <- function (x, ...) {
@@ -167,10 +172,8 @@ sensorlocs.default <- function (x, ...) {
   invisible(xx)
 }
 
-
-#' @param ... other arguments passed to \code{plot} function
-#' 
 #' @rdname sensorlocs
+#' @param ... other arguments passed to \code{plot} function
 #' @export
 
 plot.sensorlocs <- function (x, ...) {

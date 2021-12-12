@@ -13,7 +13,7 @@
 \alias{summary.ctd}
 \alias{print.summary.ctd}
 \alias{plot.ctd}
-\title{Continuous Time Domain (ctd) data}
+\title{Continuous Time Domain Data}
 \usage{
 ctd(x, fs, add.t = TRUE, ...)
 
@@ -40,8 +40,9 @@ fs(object) <- value
 \method{plot}{ctd}(x, sensors = 1:ns(x), xlim = c(0, 10), ylim = c(-50, 50), ...)
 }
 \arguments{
-\item{x}{name of a matrix that contains the data, or an object that can be coerced to a matrix,
-consisting of \code{npts} data points as rows, and \code{ns} signals as columns.}
+\item{x}{name of a matrix that contains the data, or an object that can be
+coerced to a matrix, consisting of \code{npts} data points as rows, and
+\code{ns} signals as columns.}
 
 \item{fs}{the sampling frequency in Hertz.}
 
@@ -60,20 +61,25 @@ consisting of \code{npts} data points as rows, and \code{ns} signals as columns.
 \item{ylim}{Numeric. Lower and upper limits of plot Y-axis (default: -50,50)}
 }
 \value{
-A \code{ctd} object, a numeric matrix with attributes \code{fs}, \code{ns}, and \code{npts}.
-If the input matrix does not have column names, the columns will be named \code{S1 ... Snpts}. An additional
-variable \code{t} containing time points will be generated if not present already and \code{add.t = TRUE}
+A \code{ctd} object, a numeric matrix with attributes \code{fs},
+  \code{ns}, and \code{npts}. If the input matrix does not have column names,
+  the columns will be named \code{S1 ... Snpts}. An additional variable
+  \code{t} containing time points will be generated if not present already
+  and \code{add.t = TRUE}
 }
 \description{
-Define the \code{ctd} object and associated methods
+Define the \code{ctd} object and associated methods.
 }
 \details{
-The \code{ctd} object can be used to store \strong{c}ontinuous \strong{t}ime \strong{d}omain data. 
- A \code{ctd} object is a numeric matrix with attributes\cr
- \code{fs} - the sampling frequency,\cr
- \code{ns} - the number of signals/channels, (columns of the matrix), and \cr
- \code{npts} - the number of data points/samples (rows of the matrix).\cr
- Methods exist to print, summarize, and plot the data.
+The \code{ctd} object can be used to store \strong{c}ontinuous \strong{t}ime
+\strong{d}omain data.
+ A \code{ctd} object is a numeric matrix with attributes:
+ \describe{
+   \item{fs}{sampling frequency}
+   \item{ns}{number of signals/channels, (columns of the matrix)}
+   \item{npts}{ - the number of data points/samples (rows of the matrix)}
+}
+Methods exist to print, summarize, and plot the data.
 }
 \examples{
 # simulate some rather silly data that could look like EEG (2 channels)

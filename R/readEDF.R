@@ -281,7 +281,7 @@ readEDF <- function (file, records = "all", signals = "all",
 
   # Determine whether to read 16-bit (EDF) or 24-bit (BDF) integers
   size <- ifelse(id0==-1 && substr(id1,1,7)=='BIOSEMI' && 
-                   (substr(version,1,5)=='24BIT' || substr(version,1,4) == 'BDF+'), 3, 2)
+                   (substr(version,1,5)=='24BIT' || substr(version,1,3) == 'BDF'), 3, 2)
 
   # open temporary file for writing single bytes
   tmpf <- tempfile()

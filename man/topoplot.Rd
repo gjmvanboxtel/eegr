@@ -10,88 +10,93 @@ topoplot(
   res = 200,
   scale = "auto",
   plot = c("sensorlocs", "legend"),
+  col = (grDevices::colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F",
+    "yellow", "#FF7F00", "red", "#7F0000")))(100),
+  xlab = "",
+  ylab = "",
+  main = "",
   ...
 )
 }
 \arguments{
-\item{x}{Numeric array (coerced). The data to be interpolated and plotted. The number of data points should
-equal the number of sensors in the \code{sens} parameter.}
+\item{x}{Numeric array (coerced). The data to be interpolated and plotted.
+The number of data points should equal the number of sensors in the
+\code{sl} parameter.}
 
-\item{sl}{\code{\link{sensorlocs}} object, or data frame with sensor coordinates. Should at least contain the variables
-'label', 'x2d' and 'y2d'.}
+\item{sl}{\code{\link{sensorlocs}} object, or data frame with sensor
+coordinates. Should at least contain the variables 'label', 'x2d' and
+'y2d'.}
 
 \item{res}{Numeric. Resolution of the output grid, Default 200.}
 
-\item{scale}{Plot using this scale. Use "auto" (default) for automatic scaling; otherwise pass a pair of c(min, max),
-e.g., c(-40,40).}
+\item{scale}{Plot using this scale. Use "auto" (default) for automatic
+scaling; otherwise pass a pair of c(min, max), e.g., c(-40,40).}
 
-\item{plot}{Character. Specifies how the plot will look like. Levels are always plotted, "sensorlocs" (default) plots sensor
-locations as dots, "legend" plots a legend at the right side of the plot, "contour" specifies contour lines with values in the plot,
-"labels" plots sensor labels, and "all" plots all of the above.}
+\item{plot}{Character. Specifies how the plot will look like. Levels are
+always plotted, "sensorlocs" plots sensor locations as dots, "legend" plots
+a legend at the right side of the plot, "contour" specifies contour lines
+with values in the plot, "labels" plots sensor labels, and "all" plots all
+of the above. Default: \code{c("sensorlocs", "Legend")}.}
 
-\item{...}{Additional parameters passed to the 'image' function, e.g. main=}
+\item{col}{color palette used for the map. Default: jet colors (as in
+Matlab), interpolated using \code{\link[grDevices]{colorRampPalette}}
+using 100 levels.}
+
+\item{xlab, ylab, main}{labels passed too plotting function. Default: "".}
+
+\item{...}{Additional parameters passed to the plotting function.}
 }
 \value{
-list with 4 components:
+A list with 4 components, returned invisibly: 
 \describe{
-  \item{x,y}{vectors of x- and y- coordinates of the output grid, each 'res' values ranging from -200 to + 200.}
-  \item{z}{matrix of fitted z-values, dimensions 400 x 400. The fitted value at an sensor location with coordinates
-  x2d and y2d can be found at z[(x2d * 360/pi), (y2d * 360/pi)].}
-  \item{zlim}{range of z-values used in the interpolation}
-}
+  \item{x, y}{vectors of x- and y- coordinates of the output grid, each 'res'
+  values ranging from -200 to + 200.}
+  \item{z}{matrix of fitted z-values, dimensions 400 x 400. The fitted value
+  at an sensor location with coordinates x2d and y2d can be found at
+  \code{z[x2d, y2d]}.}
+  \item{zlim}{range of z-values used in the interpolation} }
 }
 \description{
-Draw a topographical plot of EEG data using spherical spline interpolation
+Draw a topographical plot of EEG data using spherical spline interpolation.
 }
 \details{
-The function \code{topoplot} draws a topographical map of EEG data \code{x} recorded at sensors \code{sens}.
-Values in between sensor locations are interpolated using spherical splines, as proposed by Perrin et al. (1989,
-see also the Corrigendum). The plot may optionally include contour lines, sensor positions, sensor labels, and a
-legend. Scaling can be manual or automatic.
+The function \code{topoplot} draws a topographical map of EEG data \code{x}
+recorded at sensors \code{sens}. Values in between sensor locations are
+interpolated using spherical splines. The plot may optionally include contour
+lines, sensor positions, sensor labels, and a legend. Scaling can be manual
+or automatic.
 
-The function assumes the internal sensor coordinate system, which originates in the middle of the head (0,0,0). See
-\code{\link{sensorlocs}}
+The function assumes the internal sensor coordinate system, which originates
+in the middle of the head (0,0,0). See \code{\link{sensorlocs}}
 
-Multiple topoplots can also be combined on a single page or display, using appropriate par(mfrow = c()), par(mfcol = c()),
-or split.screen() commands. In such cases, you may want to draw a single legend for all graphs. To do so, do not specify plotting
-a legend in the constituent plots, but add the legands after plotting, as in the example below.
-}
-\note{
-Spline interpolation is implemented through the \code{sspline} package, which implements the methods proposed by Wahba (1981),
-on which the work of Perrin et al. (1989) is also based. The \code{sspline} package works with latitudes and longitudes in degrees
-instead of sensor locations as defined internally in the \code{eegr} package. This i s normally hidden from the user calling this
-function, and only important for users who want to work with the underlying code.
+Multiple topoplots can also be combined on a single page or display, using
+appropriate par(mfrow = c()), par(mfcol = c()), or split.screen() commands.
+In such cases, you may want to draw a single legend for all graphs. To do so,
+do not specify plotting a legend in the constituent plots, but add the
+legends after plotting, as in the example below.
 }
 \examples{
-\dontrun{
-data <- ReadEDF ("yourfile")
-sensors <- getLocationsfromLabels(labels = data$head$label)
-opar <- par(xpd=NA, mfrow=c(1,2));
-ret <- topoplot (data$ctd[200,], sensors, scale = c(-10, 10),
-       plot = c("contour","sensorlocs"), main="Plot1");
-ret <- topoplot (data$ctd[400,], sensors, scale = c(-10, 10),
-      plot = c("contour","sensorlocs"), main="Plot2");
-usr <- par("usr")
-plotrix::color.legend(xl = usr[2], yb = (usr[3] + 23), xr = (usr[2] + 23), yt = (usr[4] - 23)
-                      rect.col = rev(rainbow(250,start=0,end=.7)),
-                      gradient = "y", align = "rb",
-                      legend = sprintf("\%+2.0f", seq(-10, 10, length=5)))
-par(opar)
-# Note: use appropriate scaling min and max scaling limits
-}
+data("EEGdata")
+ncoi <- 28
+coi <- colnames(EEGdata)[1:ncoi]
+sensors <- getLocationsfromLabels(labels = coi)
+
+## scalp distributuon of two time points, Matlab-style 'jet' colors
+op <- par(mfrow = c(1, 2))
+topoplot (EEGdata[400, coi], sensors, scale = c(-10, 10), main="Sample #400");
+topoplot (EEGdata[450, coi], sensors, scale = c(-10, 10), main="Sample #450");
+par(op)
+title(line = -2, "Example displaying two scalp maps",
+      sub = "Matlab-style jet colors")
+
+## this color scheme might be more appropriate for scalp plots
+topoplot(EEGdata[400, coi], sensors, scale = c(-20, 20),
+         col = grDevices::colorRampPalette(c("blue", "white", "red"))(50))
 
 }
-\references{
-Perrin F., Pernier J., Bertrand O., and Echallier JF. (1989). Spherical splines for scalp potential and current
-density mapping. \emph{Electroencephalogr. Clin. Neurophysiol.}, \emph{72(2)}, 184-187.
-\url{https://doi.org/10.1016/0013-4694(89)90180-6}
-
-Perrin, F., Pernier, J., Bertrand, O. and Echallier, J.F. (1990) Corrigenda: EEG 02274.
-\emph{Electroenceph. Clin. Neurophysiol.}, \emph{76}, 565. \url{https://doi.org/10.1016/0013-4694(90)90009-9}
-
-Wahba, G., (1981). Spline interpolation and smoothing on the sphere. \emph{SIAM J. Sci. Stat. Comput.},
-\emph{2(1)}, 5-16. \url{https://doi.org/10.1137/0902002}
+\seealso{
+\code{\link[grDevices]{colorRampPalette}}
 }
 \author{
-Geert van Boxtel, \email{G.J.M.vanBoxtel@gmail.com}.
+Geert van Boxtel, \email{G.J.M.vanBoxtel@gmail.com}
 }

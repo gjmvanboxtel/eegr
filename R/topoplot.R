@@ -1,211 +1,235 @@
 # topoplot.R
 # Draw a topographical plot of EEG data using spherical splines.
-# Copyright (C) 2014, 2019  Geert van Boxtel,
-# Tilburg University, G.J.M.vBoxtel@tilburguniversity.edu
+# Copyright (C) 2020  Geert van Boxtel, <G.J.M.vanBoxtel@gmail.com>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# See also: http://www.gnu.org/licenses/gpl-2.0.txt
-#
 # Version history:
 # 20140212    GvB           Initial setup
 # 20190918    GvB           version for eegr v0.1.0
+# 20210602    GvB           use Akime spherical splines
 #---------------------------------------------------------------------------------------------------------------------
 
 #' Topographic Plot
-#' 
-#' Draw a topographical plot of EEG data using spherical spline interpolation
-#' 
-#' The function \code{topoplot} draws a topographical map of EEG data \code{x} recorded at sensors \code{sens}.
-#' Values in between sensor locations are interpolated using spherical splines, as proposed by Perrin et al. (1989,
-#' see also the Corrigendum). The plot may optionally include contour lines, sensor positions, sensor labels, and a
-#' legend. Scaling can be manual or automatic.
-#' 
-#' The function assumes the internal sensor coordinate system, which originates in the middle of the head (0,0,0). See
-#' \code{\link{sensorlocs}}
-#' 
-#' Multiple topoplots can also be combined on a single page or display, using appropriate par(mfrow = c()), par(mfcol = c()),
-#' or split.screen() commands. In such cases, you may want to draw a single legend for all graphs. To do so, do not specify plotting
-#' a legend in the constituent plots, but add the legands after plotting, as in the example below.
-#' 
-#' @param x Numeric array (coerced). The data to be interpolated and plotted. The number of data points should
-#' equal the number of sensors in the \code{sens} parameter.
-#' @param sl \code{\link{sensorlocs}} object, or data frame with sensor coordinates. Should at least contain the variables
-#' 'label', 'x2d' and 'y2d'.
+#'
+#' Draw a topographical plot of EEG data using spherical spline interpolation.
+#'
+#' The function \code{topoplot} draws a topographical map of EEG data \code{x}
+#' recorded at sensors \code{sens}. Values in between sensor locations are
+#' interpolated using spherical splines. The plot may optionally include contour
+#' lines, sensor positions, sensor labels, and a legend. Scaling can be manual
+#' or automatic.
+#'
+#' The function assumes the internal sensor coordinate system, which originates
+#' in the middle of the head (0,0,0). See \code{\link{sensorlocs}}
+#'
+#' Multiple topoplots can also be combined on a single page or display, using
+#' appropriate par(mfrow = c()), par(mfcol = c()), or split.screen() commands.
+#' In such cases, you may want to draw a single legend for all graphs. To do so,
+#' do not specify plotting a legend in the constituent plots, but add the
+#' legends after plotting, as in the example below.
+#'
+#' @param x Numeric array (coerced). The data to be interpolated and plotted.
+#'   The number of data points should equal the number of sensors in the
+#'   \code{sl} parameter.
+#' @param sl \code{\link{sensorlocs}} object, or data frame with sensor
+#'   coordinates. Should at least contain the variables 'label', 'x2d' and
+#'   'y2d'.
 #' @param res Numeric. Resolution of the output grid, Default 200.
-#' @param scale Plot using this scale. Use "auto" (default) for automatic scaling; otherwise pass a pair of c(min, max),
-#'  e.g., c(-40,40).
-#' @param plot Character. Specifies how the plot will look like. Levels are always plotted, "sensorlocs" (default) plots sensor
-#' locations as dots, "legend" plots a legend at the right side of the plot, "contour" specifies contour lines with values in the plot,
-#' "labels" plots sensor labels, and "all" plots all of the above.
-#' @param ... Additional parameters passed to the 'image' function, e.g. main=
-#' 
-#' @examples 
-#' \dontrun{
-#' data <- ReadEDF ("yourfile")
-#' sensors <- getLocationsfromLabels(labels = data$head$label)
-#' opar <- par(xpd=NA, mfrow=c(1,2));
-#' ret <- topoplot (data$ctd[200,], sensors, scale = c(-10, 10),
-#'        plot = c("contour","sensorlocs"), main="Plot1");
-#' ret <- topoplot (data$ctd[400,], sensors, scale = c(-10, 10),
-#'       plot = c("contour","sensorlocs"), main="Plot2");
-#' usr <- par("usr")
-#' plotrix::color.legend(xl = usr[2], yb = (usr[3] + 23), xr = (usr[2] + 23), yt = (usr[4] - 23)
-#'                       rect.col = rev(rainbow(250,start=0,end=.7)),
-#'                       gradient = "y", align = "rb",
-#'                       legend = sprintf("%+2.0f", seq(-10, 10, length=5)))
-#' par(opar)
-#' # Note: use appropriate scaling min and max scaling limits
-#' }
-#' 
-#' @return 
-#' list with 4 components:
+#' @param scale Plot using this scale. Use "auto" (default) for automatic
+#'   scaling; otherwise pass a pair of c(min, max), e.g., c(-40,40).
+#' @param plot Character. Specifies how the plot will look like. Levels are
+#'   always plotted, "sensorlocs" plots sensor locations as dots, "legend" plots
+#'   a legend at the right side of the plot, "contour" specifies contour lines
+#'   with values in the plot, "labels" plots sensor labels, and "all" plots all
+#'   of the above. Default: \code{c("sensorlocs", "Legend")}.
+#' @param col color palette used for the map. Default: jet colors (as in
+#'   Matlab), interpolated using \code{\link[grDevices]{colorRampPalette}}
+#'   using 100 levels.
+#' @param xlab,ylab,main labels passed too plotting function. Default: "".
+#' @param ... Additional parameters passed to the plotting function.
+#'
+#' @return A list with 4 components, returned invisibly: 
 #' \describe{
-#'   \item{x,y}{vectors of x- and y- coordinates of the output grid, each 'res' values ranging from -200 to + 200.}
-#'   \item{z}{matrix of fitted z-values, dimensions 400 x 400. The fitted value at an sensor location with coordinates
-#'   x2d and y2d can be found at z[(x2d * 360/pi), (y2d * 360/pi)].}
-#'   \item{zlim}{range of z-values used in the interpolation}
-#' }
-#' 
-#' @note Spline interpolation is implemented through the \code{sspline} package, which implements the methods proposed by Wahba (1981),
-#' on which the work of Perrin et al. (1989) is also based. The \code{sspline} package works with latitudes and longitudes in degrees
-#' instead of sensor locations as defined internally in the \code{eegr} package. This i s normally hidden from the user calling this
-#' function, and only important for users who want to work with the underlying code.
-#' 
-#' @references Perrin F., Pernier J., Bertrand O., and Echallier JF. (1989). Spherical splines for scalp potential and current
-#' density mapping. \emph{Electroencephalogr. Clin. Neurophysiol.}, \emph{72(2)}, 184-187.
-#' \url{https://doi.org/10.1016/0013-4694(89)90180-6}
-#' @references Perrin, F., Pernier, J., Bertrand, O. and Echallier, J.F. (1990) Corrigenda: EEG 02274.
-#' \emph{Electroenceph. Clin. Neurophysiol.}, \emph{76}, 565. \url{https://doi.org/10.1016/0013-4694(90)90009-9}
-#' @references Wahba, G., (1981). Spline interpolation and smoothing on the sphere. \emph{SIAM J. Sci. Stat. Comput.},
-#' \emph{2(1)}, 5-16. \url{https://doi.org/10.1137/0902002}
-#' 
-#' @author Geert van Boxtel, \email{G.J.M.vanBoxtel@@gmail.com}.
-
-#' @importFrom graphics par image segments text image contour
-#' @importFrom plotrix draw.circle
-#' @importFrom sspline smooth.sspline predict.smooth.sspline
-#' @importFrom grDevices rainbow
+#'   \item{x, y}{vectors of x- and y- coordinates of the output grid, each 'res'
+#'   values ranging from -200 to + 200.}
+#'   \item{z}{matrix of fitted z-values, dimensions 400 x 400. The fitted value
+#'   at an sensor location with coordinates x2d and y2d can be found at
+#'   \code{z[x2d, y2d]}.}
+#'   \item{zlim}{range of z-values used in the interpolation} }
+#'
+#' @examples
+#' data("EEGdata")
+#' ncoi <- 28
+#' coi <- colnames(EEGdata)[1:ncoi]
+#' sensors <- getLocationsfromLabels(labels = coi)
+#'
+#' ## scalp distributuon of two time points, Matlab-style 'jet' colors
+#' col <- grDevices::colorRampPalette(c("#00007F", "blue",
+#'                                      "#007FFF", "cyan",
+#'                                      "#7FFF7F", "yellow",
+#'                                      "#FF7F00", "red",
+#'                                      "#7F0000"))(100)
+#' op <- par(mfrow = c(1, 2))
+#' topoplot (EEGdata[400, coi], sensors, scale = c(-10, 10), main="Sample #400",
+#'           col = col, plot = "sensorlocs")
+#' topoplot (EEGdata[450, coi], sensors, scale = c(-10, 10), main="Sample #450",
+#'           col = col, plot = "sensorlocs")
+#' par(op)
+#' title("Example displaying two scalp maps")
+#' usr <- graphics::par("usr")
+#' plotrix::color.legend(xl = usr[2] + 0.15, yb = usr[3] + 0.35,
+#'       xr = usr[2] + 0.35, yt = usr[4] - 0.35,
+#'       rect.col = col, gradient="y", align="rb",
+#'       legend = sprintf("%+2.0f", seq(-10, 10, length = 5)))
+#'
+#' ## this color scheme might be more appropriate for scalp plots
+#' topoplot(EEGdata[400, coi], sensors, scale = c(-20, 20),
+#'          col = grDevices::colorRampPalette(c("blue", "white", "red"))(50))
+#'
+#' @author Geert van Boxtel, \email{G.J.M.vanBoxtel@@gmail.com}
+#'
+#' @seealso \code{\link[grDevices]{colorRampPalette}}
+#'
 #' @export
 
-
-topoplot <- function (x, sl, res = 200, scale = "auto", plot = c("sensorlocs", "legend"), ...) {
+topoplot <- function (x, sl, res = 200, scale = "auto",
+                      plot = c("sensorlocs", "legend"),
+                      col = grDevices::colorRampPalette(c("#00007F", "blue",
+                                                          "#007FFF", "cyan",
+                                                          "#7FFF7F", "yellow",
+                                                          "#FF7F00", "red",
+                                                          "#7F0000"))(100),
+                      xlab = "", ylab = "", main = "", ...) {
   
+  # parameter checking
+  snames <- names(x)
   x <- as.numeric(x)
-
-  if (!"theta" %in% colnames(sl)) stop ('sensorlocs data frame must contain theta variable')
-  if (!"phi" %in% colnames(sl)) stop ('sensorlocs data frame must contain phi variable')
+  if (anyNA(x)) {
+    stop("'x' must not contain any missing values")
+  }
   sl <- sensorlocs(sl)
+  if (!("x2d" %in% colnames(sl)) || !("y2d" %in% colnames(sl))) {
+    stop ('sensorlocs data frame must contain x2d and y2d variables')
+  }
+  if(!is.null(snames) && !identical(as.character(sl$label), snames)) {
+    stop('names of variables in x must match labels in sensorlocs data frame')
+  }
+  if (is.na(res) || is.null(res) || !is.numeric(res)) {
+    res <- 200
+  }
+  if (is.character(scale)) {
+    if (scale != "auto") {
+      stop('scale must be "auto" (or a numeric vector of length 2)')
+    }
+  } else if (is.numeric(scale)) {
+    if (length(scale) != 2) {
+      stop('scale must be a numeric vector of length 2 (or "auto")')
+    }
+  } else {
+    stop('scale must be "auto" or a numeric vector of length 2')
+  }
+  plot <- match.arg(plot, 
+                    c("sensorlocs", "legend", "contour", "labels", "all"),
+                    several.ok = TRUE)
+  # end of parameter checking
 
-  lat <- sl$theta
-  lon <- sl$phi
-  if (!(length(x) == length(lat) && length(x) == length(lon))) stop ('The number of data points must equal the number of sensors')
-  if(is.na(res) || is.null(res) || !is.numeric(res)) res <- 200
+  # spherical spline interolation using the 'akima' package
+  ip <- akima::interp(sl$x2d, sl$y2d, x, linear = FALSE, extrap = TRUE,
+                      xo = seq(-2, 2, length.out = res),
+                      yo = seq(-2, 2, length.out = res))
   
-  # define interpolated latitude and longitude grid
-  # the output grid is of size res * res, varing from -200 to +200
-  # (a little more than 180 degrees; the rest will be set to NA later)
-  iplat <- seq(-200, 200, len = res)
-  iplon <- seq(-200, 200, len = res)
-  
-  # spherical spline interolation using the 'sspline' package
-  spl <- sspline::smooth.sspline(lat = lat, lon = rev(lon), x)
-  pred <- sspline::predict.smooth.sspline(spl, lat = iplat, lon = iplon, grid = TRUE)
-  
-  # interpolation produces a square grid. Make it a circle
-  # Sensor Locations range from from -pi/2 to +pi/2 radians, the interpolated data from to -180 to +180 degrees
-  # So the conversion ratio is 360/pi
-  rad2deg <- 360 / pi
-  max_xy <- max((sl$x2d * rad2deg), (sl$y2d * rad2deg), 180)
-  r <- sqrt(outer(iplon^2, iplat^2, "+"))
-  pred[r > max_xy] <- NA
+  # interpolation produces a square grid. Make it a circle - Sensor Locations
+  # range from from -pi/2 to +pi/2 radians
+  max_xy <- max(sl$x2d, sl$y2d, pi / 2)
+  r <- sqrt(outer(ip$x^2, ip$y^2, "+"))
+  ip$z[r > max_xy] <- NA 
   
   # now define the scaling limits for the data
   # autoscaling: compute minimum and maximum of the prediction matrix
   if ("auto" %in% scale) {
-    zlim <- c(floor(min(pred, na.rm=T)), ceiling(max(pred, na.rm=T)))
-  } else {;
+    zlim <- c(floor(min(ip$z, na.rm = TRUE)), ceiling(max(ip$z, na.rm = TRUE)))
+  } else {
     zlim = scale
   }
   # clip values outside of limits
-  pred[which(pred < zlim[1])] <- zlim[1]
-  pred[which(pred > zlim[2])] <- zlim[2]
-  
-  #Now start plotting...
-  plot <- match.arg(plot, several.ok = TRUE)
+  ip$z[which(ip$z < zlim[1])] <- zlim[1]
+  ip$z[which(ip$z > zlim[2])] <- zlim[2]
   
   #define plotting region (square, no margins)
-  op <- graphics::par(pty="s", mar = c(2, 2, 2, 2))
+  op <- graphics::par(pty = "s", mar = c(2.5, 2.5, 2.5, 2.5))
+  on.exit(graphics::par(op))
   
-  # square plot using 'image', no axes, rainbow colors
-  graphics::image(iplat, iplon, pred, axes = FALSE, xlim=c(-200, 200), ylim = c(-200, 200), zlim=zlim, 
-                  xlab = "", ylab = "", col = rev(grDevices::rainbow(250, start=0, end=.7)), ...)
+  # square plot using 'image', no axes
+  graphics::image(ip$x, ip$y, ip$z, axes = FALSE, col = col,
+                  xlim = c(-2, 2), ylim = c(-2, 2), zlim = zlim, 
+                  xlab = xlab, ylab = ylab, main = main, ...)
 
-  #contour requested? compute range and define range/5 contour levels
+  # contour requested? compute range and define range/5 contour levels
   if ("contour" %in% plot || "all" %in% plot) {
     range <- sum(abs(zlim))
-    graphics::contour(iplat, iplon, pred, add = TRUE, axes = FALSE, nlevels = 5)
+    graphics::contour(ip$x, ip$y, ip$z, add = TRUE, axes = FALSE, nlevels = 5)
   }
   
-  #electrodes requested?
-  if ("electrodes" %in% plot || "all" %in% plot) {
-    graphics::points((sl$x2d * rad2deg), (sl$y2d * rad2deg), xlim = c(-200, 200), ylim=c(-200, 200), bty = "n", pch = 20)
+  # sensorlocs requested?
+  if ("sensorlocs" %in% plot || "all" %in% plot) {
+    graphics::points(sl$x2d, sl$y2d, xlim = c(-2, 2), ylim = c(-2, 2),
+                     bty = "n", pch = 20)
   }
   
-  #electrode labels requested?
+  # sensor labels requested?
   if ("labels" %in% plot || "all" %in% plot) {
     for (i in 1:nrow(sl)) {
-      text(x = (sl$x2d[i] * rad2deg), y = ((sl$y2d[i] * rad2deg) + 12), labels = sl$label[i])
+      graphics::text(x = sl$x2d[i], y = (sl$y2d[i] + 0.1), labels = sl$label[i])
     }
   }
   
   #draw circle
-  radius <- 180
+  deg2rad <- (2 * pi) / 360
+  radius <- 90 * deg2rad
   xy <- plotrix::draw.circle(0.0, 0, radius, lwd = 2)
-  
+
   # draw nose
-  graphics::segments(-22, (radius - 2), 0, (radius + 17), lwd = 2)
-  graphics::segments(0, (radius + 17), 22, (radius - 2), lwd=2)
+  graphics::segments(-0.2, radius - 0.02, 0.0, radius + 0.15, lwd = 2)
+  graphics::segments(0.0, radius + 0.15, 0.2, radius - 0.02, lwd = 2)
   
   # draw ears
-  graphics::segments(-(radius - 2), 23, -(radius + 7), 34, lwd = 2)
-  graphics::segments(-(radius + 7), 34, -(radius + 7), -34, lwd = 2)
-  graphics::segments(-(radius + 7), -34, -(radius - 2), -23, lwd = 2)
-  graphics::segments(+(radius - 2), 23, +(radius + 7), 34, lwd = 2)
-  graphics::segments(+(radius + 7), 34, +(radius + 7), -34, lwd = 2)
-  graphics::segments(+(radius + 7), -34, +(radius - 2), -23, lwd = 2)
-
+  graphics::segments(-(radius - 0.02), +0.2, -(radius + 0.06), +0.3, lwd = 2)
+  graphics::segments(-(radius + 0.06), +0.3, -(radius + 0.06), -0.3, lwd = 2)
+  graphics::segments(-(radius + 0.06), -0.3, -(radius - 0.02), -0.2, lwd = 2)
+  graphics::segments(+(radius - 0.02), +0.2, +(radius + 0.06), +0.3, lwd = 2)
+  graphics::segments(+(radius + 0.06), +0.3, +(radius + 0.06), -0.3, lwd = 2)
+  graphics::segments(+(radius + 0.06), -0.3, +(radius - 0.02), -0.2, lwd = 2)
+  
   #legend requested? Set it in user coordinates at the left of the plot
   #electrode labels requested?
   if ("legend" %in% plot || "all" %in% plot) {
-    usr <- par("usr")
-    plotrix::color.legend(xl = usr[2], yb = (usr[3] + 23), xr = (usr[2] + 23), yt = (usr[4] - 23),
-                          rect.col = rev(grDevices::rainbow(250, start = 0, end = .7)),
-                          gradient = "y", align = "rb",
-                          legend = sprintf("%+2.0f", seq(zlim[1], zlim[2], length = 5))
-                          )
+    usr <- graphics::par("usr")
+    plotrix::color.legend(xl = usr[2], yb = usr[3] + 0.2,
+                          xr = usr[2] + 0.2, yt = usr[4] - 0.2,
+                          rect.col = col, gradient="y", align="rb",
+                          legend = sprintf("%+2.0f", seq(zlim[1], zlim[2],
+                                                         length = 5))
+    )
     # # tick marks
-    par (mar = c(0, 0, 0, 0))
-    steps <- (usr[4] - 23) / 2
+    graphics::par(mar = c(0, 0, 0, 0))
+    steps <- (usr[4] - 0.2) / 2
     for (i in 0:4) {
-      graphics::segments(usr[2], (usr[3] + 23 + (i * steps)), (usr[2] + 23), (usr[3] + 23 + (i * steps)), lwd = 2)
+      graphics::segments(usr[2], (usr[3] + 0.2 + (i * steps)),
+                         (usr[2] + 0.2), usr[3] + 0.2 + (i * steps),
+                         col = "black", lwd = 2)
     }
   }
   
-  #reset plot parameters
-  par(op)
-  
   #ready
-  invisible(list(x = iplat, y = iplon, z = pred, zlim = zlim))
+  invisible(list(x = ip$x, y = ip$y, z = ip$z, zlim = zlim))
 }
+
