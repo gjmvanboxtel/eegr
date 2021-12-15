@@ -4,11 +4,11 @@
 \alias{ctd}
 \alias{ctd.default}
 \alias{npts}
-\alias{npts<-}
+\alias{npts.ctd}
 \alias{ns}
-\alias{ns<-}
+\alias{ns.ctd}
 \alias{fs}
-\alias{fs<-}
+\alias{fs.ctd}
 \alias{print.ctd}
 \alias{summary.ctd}
 \alias{print.summary.ctd}
@@ -21,15 +21,15 @@ ctd(x, fs, add.t = TRUE, ...)
 
 npts(object)
 
-npts(object) <- value
+\method{npts}{ctd}(object)
 
 ns(object)
 
-ns(object) <- value
+\method{ns}{ctd}(object)
 
 fs(object)
 
-fs(object) <- value
+\method{fs}{ctd}(object)
 
 \method{print}{ctd}(x, ...)
 
@@ -50,9 +50,7 @@ coerced to a matrix, consisting of \code{npts} data points as rows, and
 
 \item{...}{other arguments}
 
-\item{object}{Object, usually of class \code{ctd}}
-
-\item{value}{the attribute \code{npts}, \code{ns}, or \code{fs} will be set to this value}
+\item{object}{Object}
 
 \item{sensors}{Numeric. Sensors to plot (default \code{1:ns})}
 
@@ -82,6 +80,9 @@ The \code{ctd} object can be used to store \strong{c}ontinuous \strong{t}ime
 Methods exist to print, summarize, and plot the data.
 }
 \examples{
+# coming soon
+f <- 1
+
 # simulate some rather silly data that could look like EEG (2 channels)
 # assume 2 seconds of data sampled at 100 Hz
 C3 <- arima.sim(list(order = c(1,1,0), ar = 0.7), n = 199)+(10*rnorm(200))

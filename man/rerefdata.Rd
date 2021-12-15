@@ -42,10 +42,11 @@ Compute the average reference or a new common reference for data in a
 }
 \examples{
 
-data(EEGdata)
-new <- rerefdata(EEGdata, 'all', 'average')
-plot(new)
-new <- rerefdata(EEGdata, 'all', c('M1', 'M2'))
+
+#data(EEGdata)
+#new <- rerefdata(EEGdata, 'all', 'average')
+#plot(new)
+#new <- rerefdata(EEGdata, 'all', c('M1', 'M2'))
 
 }
 \seealso{

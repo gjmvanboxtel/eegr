@@ -18,6 +18,8 @@
 # 20190918  GvB       Setup for eegr 0.1.0 (using matrix instead of data frame)
 # 20201224  GvB       v0.3-0: documentation; make all attributed explicitely numeric
 #                     (bug 20200416)
+# 20211215  GvB       v0.3-2: added .ctd extension to fs(), ns(), npts()
+#                     remove th assignment forms fs<- ns<- npts<-
 #---------------------------------------------------------------------------------------------------------------------
 
 #' Continuous Time Domain Data
@@ -38,6 +40,10 @@
 #'   coerced to a matrix, consisting of \code{npts} data points as rows, and
 #'   \code{ns} signals as columns.
 #' @param ... other arguments
+#' 
+#' @examples 
+#' # coming soon
+#' f <- 1
 #' 
 #' @author Geert van Boxtel, \email{G.J.M.vanBoxtel@@gmail.com}
 #' 
@@ -90,51 +96,43 @@ ctd.default <- function (x, fs, add.t = TRUE, ...) {
 }
 
 #'
-#' \code{npts} returns the \code{npts} atrribute (number of points, samples, rows) of a \code{ctd} object (or \code{NULL}).
-#' \code{npts<-} sets the \code{npts} attribute
-#' 
-#' @param object Object, usually of class \code{ctd}
-#' @param value the attribute \code{npts}, \code{ns}, or \code{fs} will be set to this value
+#' \code{npts} returns the \code{npts} attribute (number of points, samples,
+#' rows) of a \code{ctd} object (or \code{NULL}).
 #'
-#' @rdname ctd
-#' @export
-
-npts <- function(object) as.numeric(attr(object, "npts"))
+#' @param object Object
 
 #' @rdname ctd
 #' @export
+npts <- function (object) UseMethod ("npts")
 
-`npts<-` <- function(object, value) attr(object, "npts") <- as.numeric(value)
+#' @rdname ctd
+#' @export
+npts.ctd <- function(object) as.numeric(attr(object, "npts"))
 
-#' \code{ns} returns the \code{ns} atrribute (number of signals, samples) of a \code{ctd} object (or \code{NULL}).
-#' \code{ns<-} sets the \code{ns} attribute
+#' \code{ns} returns the \code{ns} atrribute (number of signals, samples) of a
+#' \code{ctd} object (or \code{NULL}).
 #' 
 #' @rdname ctd
 #' @export
-
-ns <- function(object) as.numeric(attr(object, "ns"))
+ns <- function (object) UseMethod ("ns")
 
 #' @rdname ctd
 #' @export
+ns.ctd <- function(object) as.numeric(attr(object, "ns"))
 
-`ns<-` <- function(object, value) attr(object, "ns") <- as.numeric(value)
-
-#' \code{fs} returns the \code{fs} atrribute (sampling frequency) of a \code{ctd} object (or \code{NULL}).
-#' \code{fs<-} sets the \code{fs} attribute
+#' \code{fs} returns the \code{fs} atrribute (sampling frequency) of a
+#' \code{ctd} object (or \code{NULL}).
 #' 
 #' @rdname ctd
 #' @export
-
-fs <- function(object) as.numeric(attr(object, "fs"))
-
-#' @rdname ctd
-#' @export
-
-`fs<-` <- function(object, value) attr(object, "fs") <- as.numeric(value)
+fs <- function (object) UseMethod ("fs")
 
 #' @rdname ctd
 #' @export
+fs.ctd <- function(object) as.numeric(attr(object, "fs"))
 
+#' @rdname ctd
+#' @export
 print.ctd <- function (x, ...)  {
   cat("Number of data points:", npts(x), "\n")
   cat("Number of signals:", ns(x), "\n")
@@ -144,7 +142,6 @@ print.ctd <- function (x, ...)  {
 
 #' @rdname ctd
 #' @export
-
 summary.ctd <- function (object, ...) {
   cn <- colnames(object)[1:ns(object)]
   m <- matrix(0, 5, ns(object), 
@@ -164,7 +161,6 @@ summary.ctd <- function (object, ...) {
 
 #' @rdname ctd
 #' @export
-
 print.summary.ctd <- function (x, ...) {
   for (c in 1:ncol(x)){
     cat(paste("\nSignal:", colnames(x)[c]))
@@ -182,6 +178,8 @@ print.summary.ctd <- function (x, ...) {
 
 plot.ctd <- function (x, sensors=1:ns(x), xlim=c(0,10), ylim=c(-50,50), ...) {
 
+  if(!"ctd" %in% class(x)) stop("not a ctd object")
+  
   n <- sensors
   if (is.numeric(sensors)) {
     n <- colnames(x)[sensors]

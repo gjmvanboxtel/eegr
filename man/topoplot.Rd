@@ -82,12 +82,23 @@ coi <- colnames(EEGdata)[1:ncoi]
 sensors <- getLocationsfromLabels(labels = coi)
 
 ## scalp distributuon of two time points, Matlab-style 'jet' colors
+col <- grDevices::colorRampPalette(c("#00007F", "blue",
+                                     "#007FFF", "cyan",
+                                     "#7FFF7F", "yellow",
+                                     "#FF7F00", "red",
+                                     "#7F0000"))(100)
 op <- par(mfrow = c(1, 2))
-topoplot (EEGdata[400, coi], sensors, scale = c(-10, 10), main="Sample #400");
-topoplot (EEGdata[450, coi], sensors, scale = c(-10, 10), main="Sample #450");
+topoplot (EEGdata[400, coi], sensors, scale = c(-10, 10), main="Sample #400",
+          col = col, plot = "sensorlocs")
+topoplot (EEGdata[450, coi], sensors, scale = c(-10, 10), main="Sample #450",
+          col = col, plot = "sensorlocs")
 par(op)
-title(line = -2, "Example displaying two scalp maps",
-      sub = "Matlab-style jet colors")
+title("Example displaying two scalp maps")
+usr <- graphics::par("usr")
+plotrix::color.legend(xl = usr[2] + 0.15, yb = usr[3] + 0.35,
+      xr = usr[2] + 0.35, yt = usr[4] - 0.35,
+      rect.col = col, gradient="y", align="rb",
+      legend = sprintf("\%+2.0f", seq(-10, 10, length = 5)))
 
 ## this color scheme might be more appropriate for scalp plots
 topoplot(EEGdata[400, coi], sensors, scale = c(-20, 20),
