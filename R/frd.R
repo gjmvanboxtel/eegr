@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # Version history
-# 20211214  GvB       Setup for eegr 0.3-1
+# 20211222  GvB       Setup for eegr 0.3-1
 #---------------------------------------------------------------------------------------------------------------------
 
 #' Frequency Domain Data
@@ -47,7 +47,6 @@
 #'   \code{'phase'}, \code{'coherence'}
 #' @param yscale scale of the data, one of \code{'linear'}, \code{'log'},
 #'   \code{'dB'}
-#' @param ... other arguments
 #' 
 #' @examples 
 #' # coming up
@@ -72,24 +71,35 @@ frd <- function (x, ...) UseMethod ("frd", x)
 frd.default <- function (x, f, fu = c("Hz", "rad/s", "normalized"), fs = 1,
                          type = c("spectrum", "cross-spectrum", "phase", "coherence"),
                          yscale = c("linear", "log", "dB"), ...) {
-  
+  if (is.vector(x)) {
+    x <- matrix(x, ncol = 1)
+  }
+  if (is.vector(f)) {
+    f <- matrix(f, ncol = 1)
+  }
+  if (nrow(x) != nrow(f)) {
+    stop("Number of rows in x and f do not match")
+  }
   fu <- match.arg(fu)
   type <- match.arg(type)
   yscale <- match.arg(yscale)
-  x <- as.matrix (x)
   npts <- nrow(x)
   ns <- ncol(x)
   cn <- colnames(x)
-  if (is.null(cn)) cn <- paste0("S",seq_len(ns))
-  
-  class(x) <- c("frd", "matrix")
-  attr(x, "npts") <- as.numeric(npts)
-  attr(x, "ns") <- as.numeric(ns)
-  attr(x, "fs") <- as.numeric(fs)
-  attr(x, "fu") <- fu
-  attr(x, "type") <- type
-  attr(x, "yscale") <-yscale
-  x
+  if (is.null(cn)) {
+    cn <- paste0("S", seq_len(ns))
+  }
+
+  y <- cbind(x, f)
+  colnames(y) <- c(cn, "f")
+  class(y) <- c("frd", "matrix")
+  attr(y, "npts") <- as.numeric(npts)
+  attr(y, "ns") <- as.numeric(ns)
+  attr(y, "fs") <- as.numeric(fs)
+  attr(y, "fu") <- fu
+  attr(y, "type") <- type
+  attr(y, "yscale") <-yscale
+  y
 }
 
 #'
@@ -175,9 +185,12 @@ print.frd <- function (x, ...)  {
 #' @param sensors Numeric. Sensors to plot (default \code{1:ns})
 #' @param xlim Numeric. Lower and upper limits of plot X-axis (default: 0,10)
 #' @param ylim Numeric. Lower and upper limits of plot Y-axis (default: -50,50)
+#' @param ... additional arguments passed to functions
+
 #' @export
 
 plot.frd <- function (x, sensors = setdiff(colnames(x), "f"),
+                      yscale = c("linear", "log", "dB"),
                       xlim = c(0, fs(x) / 2), ylim = NULL, ...) {
 
   if(!("frd" %in% class(x))) stop("not an frd object")
@@ -188,14 +201,36 @@ plot.frd <- function (x, sensors = setdiff(colnames(x), "f"),
     n <- sensors
   }
   ns <- length(n)
+  
+  yscx <- yscale(x)
+  if (yscx == "linear") {
+    if (yscale == "log") {
+      x[, n] <- log10(x[, n])
+    } else if (yscale == "dB") {
+      x[, n] <- 10 * log10(x[, n])
+    }
+  } else if (yscx == "log") {
+    if (yscale == "linear") {
+      x[, n] <- 10^x[, n]
+    } else if (yscale == "dB") {
+      x[, n] <- 10 * x[, n]
+    }
+  } else if (yscx == "dB") {
+    if (yscale == "linear") {
+      x[, n] <- 10^(x[, n] / n) 
+    } else if (yscale == "log") {
+      x[, n] <- x[, n] / 10
+    }
+  }
   xlim <- pmax(xlim, x[1, "f"])
   xlim <- pmin(xlim, x[npts(x), "f"])
-  xx <- x[x[,'f'] >= xlim[1] & x[,'f'] <= xlim[2], c(n, 'f')]
-  freq <- xx[, "f"]
-  xx <- xx[, -which(colnames(x) == "f")]
+  xx <- x[x[,'f'] >= xlim[1] & x[,'f'] <= xlim[2], n]
+  freq <- x[, "f"]
   if (is.null(ylim)) {
     ylim <- range(xx)
   }
 
-  graphics::matplot(freq, xx, type = "l", xlim = xlim, ylim = ylim, ...)
+  graphics::matplot(freq, xx, type = "l", xlim = xlim, ylim = ylim,
+                    xlab = paste0("Frequency (", fu(x), ")"), 
+                    ylab = paste0(type(x), " (", yscale, ")"), ...)
 }

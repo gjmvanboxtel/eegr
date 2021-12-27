@@ -51,6 +51,7 @@ yscale(object)
 \method{plot}{frd}(
   x,
   sensors = setdiff(colnames(x), "f"),
+  yscale = c("linear", "log", "dB"),
   xlim = c(0, fs(x)/2),
   ylim = NULL,
   ...
@@ -59,7 +60,7 @@ yscale(object)
 \arguments{
 \item{x}{object}
 
-\item{...}{other arguments}
+\item{...}{additional arguments passed to functions}
 
 \item{f}{vector of frequencies}
 

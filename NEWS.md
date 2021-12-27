@@ -1,6 +1,8 @@
 # eegr 0.3-2
 - date:
 - added trd objects and methods
+- added mutitaper spectral estimation: mtspec(), mtchan(), mtfft()
+- added cleanline() function
 
 ---
 
