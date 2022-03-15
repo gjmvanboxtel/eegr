@@ -7,7 +7,7 @@
 cleanline(
   x,
   fs = 1,
-  freq = 50,
+  lfreq = 50,
   fbw = 2,
   detrend = c("short-linear", "short-mean", "long-linear", "long-mean", "none"),
   w = 4,
@@ -20,30 +20,39 @@ cleanline(
 )
 }
 \arguments{
-\item{x}{input time series, specified as a numeric or complex vector. In case
-of a vector it represents a single signal; in case of a matrix each column
-is a signal. Alternatively, an object of class \code{\link{ctd}}}
+\item{x}{input time series, specified as a numeric or complex or matrix
+vector. In case of a vector it represents a single signal; in case of a
+matrix each column is a signal. Alternatively, an object of class
+\code{\link{ctd}}}
 
 \item{fs}{sampling frequency of \code{x} in Hz. Default: 1. Overruled if
 \code{x} is a \code{ctd} object, in which case the sampling frequency is
 \code{fs(x)}}
 
-\item{freq}{frequencies to remove. Will be expended to include harmonics up
-to the Nyquist frequency. Default: 50}
+\item{lfreq}{line frequencies to remove, either specified as a single numeric
+value, or as a character string. If a single numeric value is specified,
+then this value will be expanded to include multiples of that frequency
+(harmonics) up to the Nyquist frequency. If a character string is
+specified, then the string will be converted to numeric values without
+further expansion. Default: 50}
 
-\item{fbw}{frequency bandwidth. Bandwidth centered on each \code{freq} to
+\item{fbw}{frequency bandwidth. Bandwidth centered on each \code{lfreq} to
 scan for significant lines. Default: 2 Hz.}
 
 \item{detrend}{character string specifying detrending option; one of:
  \describe{
-   \item{\code{long-mean}}{remove the mean from the data before
+   \item{\code{short-linear}}{remove the mean from the data before
    splitting into segments (default)}
    \item{\code{short-mean}}{remove the mean value of each segment}
    \item{\code{long-linear}}{remove linear trend from the data before
    splitting into segments}
-   \item{\code{short-linear}}{remove linear trend from each segment}
+   \item{\code{long-mean}}{remove linear trend from each segment}
    \item{\code{none}}{no detrending}
-}}
+}
+Specifying one of the \code{long} forms will result in detrended cleaned
+data. By contrast, specifying one the of \code{short} forms will perform the
+calculations on detrended segments but this will not affect the returned
+data.}
 
 \item{w}{length of sliding window (segments) in seconds. Default: 4}
 
@@ -62,8 +71,12 @@ Default: \code{tbw * w - 1}}
 \item{maxIter}{Maximum times to iterate removal. Default: 10}
 }
 \value{
-An object of the same size and class as the input, containing the
-  cleaned data.
+A list consiting of 3 elements:
+  \describe{
+    \item{\code{y}}{the cleaned data}
+    \item{\code{lfreq}}{the cleaned line frequencies}
+    \item{\code{niter}}{the number of iterations executed}
+  }
 }
 \description{
 Estimate and remove sinusoidal (e.g. line) noise from EEG  channels using
@@ -117,7 +130,7 @@ sigmoidal function.
 data(EEGdata)
 ospec <- mtspec(EEGdata[, 1:28], fs = fs(EEGdata), detrend = "short-linear")
 cleaned <- cleanline(EEGdata[, 1:28], fs = fs(EEGdata))
-cspec <- mtspec(cleaned, fs = fs(EEGdata), detrend = "short-linear")
+cspec <- mtspec(cleaned$y, fs = fs(EEGdata), detrend = "short-linear")
 plot(ospec[, "f"], 10 * log10(ospec[, "Pz"]), type = "l",
       main = "Multitaper Spectrum\nEEGdata - Pz",
       xlab = "Frequency (Hz)", ylab = "Power/Frequency (dB)")

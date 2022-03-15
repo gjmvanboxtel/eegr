@@ -9,15 +9,17 @@
 \alias{ns.ctd}
 \alias{fs}
 \alias{fs.ctd}
+\alias{ref}
+\alias{ref.ctd}
 \alias{print.ctd}
 \alias{summary.ctd}
 \alias{print.summary.ctd}
 \alias{plot.ctd}
 \title{Continuous Time Domain Data}
 \usage{
-ctd(x, fs, add.t = TRUE, ...)
+ctd(x, fs, ref = NA, add.t = TRUE, ...)
 
-\method{ctd}{default}(x, fs, add.t = TRUE, ...)
+\method{ctd}{default}(x, fs, ref = NA, add.t = TRUE, ...)
 
 npts(object)
 
@@ -30,6 +32,10 @@ ns(object)
 fs(object)
 
 \method{fs}{ctd}(object)
+
+ref(object)
+
+\method{ref}{ctd}(object)
 
 \method{print}{ctd}(x, ...)
 
@@ -45,6 +51,9 @@ coerced to a matrix, consisting of \code{npts} data points as rows, and
 \code{ns} signals as columns.}
 
 \item{fs}{the sampling frequency in Hertz.}
+
+\item{ref}{names or numbers of reference sensors, "avg" or "average" for
+average reference. Default: NA}
 
 \item{add.t}{flag indicating whether to add a time variable to the matrix}
 
@@ -75,14 +84,12 @@ The \code{ctd} object can be used to store \strong{c}ontinuous \strong{t}ime
  \describe{
    \item{fs}{sampling frequency}
    \item{ns}{number of signals/channels, (columns of the matrix)}
-   \item{npts}{ - the number of data points/samples (rows of the matrix)}
+   \item{npts}{the number of data points/samples (rows of the matrix)}
+   \item{ref}{names or numbers of reference sensors}
 }
 Methods exist to print, summarize, and plot the data.
 }
 \examples{
-# coming soon
-f <- 1
-
 # simulate some rather silly data that could look like EEG (2 channels)
 # assume 2 seconds of data sampled at 100 Hz
 C3 <- arima.sim(list(order = c(1,1,0), ar = 0.7), n = 199)+(10*rnorm(200))
