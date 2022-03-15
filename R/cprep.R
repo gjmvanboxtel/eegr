@@ -286,7 +286,9 @@ cprep <- function(x, fs = 1,
     con <- file(Rmd, "w+")
     writeLines('---', con)
     writeLines('title: "Results from the cPREP pipeline"', con)
-    writeLines(paste('author: cPREP version eegr', desc::desc_get_version()), con)
+    descr <- system.file("DESCRIPTION", package = "eegr")
+    writeLines(paste('author: cPREP version eegr',
+                     desc::desc_get_version(descr)), con)
     writeLines(paste('date: "report generated `r date()`"'), con)
     writeLines('output:', con)
     writeLines('  pdf_document:', con)
