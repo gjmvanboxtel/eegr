@@ -1,8 +1,11 @@
 # eegr 0.3-2
-- date:
+- date: 20220315
 - added trd objects and methods
 - added mutitaper spectral estimation: mtspec(), mtchan(), mtfft()
-- added cleanline() function
+- added cleanline(), removetrend(), ssinterp(), unusablesensors(),
+        noisysensors(), cprep(), eeginterp(), reref() functions
+- added 'ref'' attribute to ctd object
+
 
 ---
 

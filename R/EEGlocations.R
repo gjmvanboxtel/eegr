@@ -1,4 +1,4 @@
-# EEGlolcations.R
+# EEGlocations.R
 # Copyright (C) 2020  Geert van Boxtel, <G.J.M.vanBoxtel@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
