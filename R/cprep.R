@@ -149,6 +149,7 @@ cprep <- function(x, fs = 1,
                   ) {
   
   x_name <- deparse(substitute(x))
+  x_name <- gsub("$", paste0("\\", "$"), x_name, fixed = TRUE)   #Latex will choke on $
   
   # parameter checking: x and fs
   if ("ctd" %in% class(x)) {
@@ -334,6 +335,7 @@ cprep <- function(x, fs = 1,
     writeLines('```', con)
     writeLines('', con)
     
+    writeLines('\\ ', con)
     writeLines('\\clearpage', con)
     writeLines('', con)
     
@@ -363,7 +365,7 @@ cprep <- function(x, fs = 1,
     huxtable::wrap(table) <- TRUE
     huxtable::caption(table) <- paste('Characteristics of', x_name)
     huxtable::top_border(table)[1, ] <- 1
-    huxtable::bottom_border(table)[5, ] <- 1
+    huxtable::bottom_border(table)[nrow(table), ] <- 1
     
     writeLines(huxtable::to_latex(table), con)
     writeLines('', con)
@@ -386,7 +388,7 @@ cprep <- function(x, fs = 1,
     huxtable::wrap(table) <- TRUE
     huxtable::caption(table) <- "Arguments to cprep() function"
     huxtable::top_border(table)[1, ] <- 1
-    huxtable::bottom_border(table)[26, ] <- 1
+    huxtable::bottom_border(table)[nrow(table), ] <- 1
     
     writeLines(huxtable::to_latex(table), con)
     writeLines('', con)
@@ -394,7 +396,8 @@ cprep <- function(x, fs = 1,
     writeLines('The following pages provide details about the actions performed in each step of', con)
     writeLines('the cPREP pipeline.  ', con)
     writeLines('', con)
-    
+
+    writeLines('\\ ', con)
     writeLines('\\clearpage', con)
     writeLines('', con)
     
@@ -452,7 +455,8 @@ cprep <- function(x, fs = 1,
         writeLines(paste0('knitr::include_graphics("', png_detr_freqz, '")'), con)
         writeLines('```', con)
         writeLines('', con)
-        
+    
+        writeLines('\\ ', con)
         writeLines('\\clearpage', con)
         writeLines('', con)
       }
@@ -491,6 +495,7 @@ cprep <- function(x, fs = 1,
   tdiff <- toc - tic
   if (rep) {
     writeLines(paste('Elapsed time:', format(tdiff, digits = 4, scientific = FALSE)), con)
+    writeLines('\\ ', con)
     writeLines('\\clearpage', con)
     writeLines('', con)
   }
@@ -535,7 +540,7 @@ cprep <- function(x, fs = 1,
     huxtable::wrap(table) <- TRUE
     huxtable::caption(table) <- paste('Line noise removal parameters for', x_name)
     huxtable::top_border(table)[1, ] <- 1
-    huxtable::bottom_border(table)[10, ] <- 1
+    huxtable::bottom_border(table)[nrow(table), ] <- 1
     
     writeLines(huxtable::to_latex(table), con)
     writeLines('', con)
@@ -570,7 +575,7 @@ cprep <- function(x, fs = 1,
       huxtable::wrap(table) <- TRUE
       huxtable::caption(table) <- 'Number of iterations'
       huxtable::bottom_border(table)[1, ] <- 1
-      huxtable::bottom_border(table)[2, ] <- 1
+      huxtable::bottom_border(table)[nrow(table), ] <- 1
       if (ns > 10) {
         ltable <- huxtable::split_down(table, seq(10, ns, 10))
       } else {
@@ -589,12 +594,13 @@ cprep <- function(x, fs = 1,
       espec <- gsignal::pwelch(cleaned$y, window = 4 * fs, overlap = 0.75, fs = fs, detrend = "none")
       
       #get noise reduction for the requested frequencies
-      fidx <- rep(0, length(cleaned$lfreq))
-      for (fk in seq_along(cleaned$lfreq)) {
+      nfrex <- length(cleaned$lfreq)
+      fidx <- rep(0, nfrex)
+      for (fk in seq_len(nfrex)) {
         fidx[fk] <- which.min(abs(espec$freq - cleaned$lfreq[fk]))
         writeLines('', con)
       }
-      nr <- 10 * log10(espec$spec[fidx, ] / bspec$spec[fidx, ])
+      nr <- matrix(10 * log10(espec$spec[fidx, ] / bspec$spec[fidx, ]), nrow = nfrex)
       rownames(nr) <- paste(cleaned$lfreq, "Hz")
 
       writeLines('And the following table shows the noise reduction for each sensor at each line frequency.', con)
@@ -611,7 +617,7 @@ cprep <- function(x, fs = 1,
       huxtable::wrap(table) <- TRUE
       huxtable::caption(table) <- 'Line noise reduction in dB'
       huxtable::bottom_border(table)[1, ] <- 1
-      huxtable::bottom_border(table)[3, ] <- 1
+      huxtable::bottom_border(table)[nrow(table), ] <- 1
       if (ns > 10) {
         ltable <- huxtable::split_down(table, seq(10, ns, 10))
       } else {
@@ -624,6 +630,7 @@ cprep <- function(x, fs = 1,
         writeLines('', con)
       }
 
+      writeLines('\\ ', con)
       writeLines('\\clearpage', con)
       writeLines('', con)
       
@@ -661,6 +668,7 @@ cprep <- function(x, fs = 1,
   if (rep) {
     writeLines('', con)
     writeLines(paste('Elapsed time:', format(tdiff, digits = 4, scientific = FALSE)), con)
+    writeLines('\\ ', con)
     writeLines('\\clearpage', con)
     writeLines('', con)
   }
@@ -707,14 +715,13 @@ cprep <- function(x, fs = 1,
     huxtable::wrap(table) <- TRUE
     huxtable::caption(table) <- paste('Referencing parameters for', x_name)
     huxtable::top_border(table)[1, ] <- 1
-    huxtable::bottom_border(table)[7, ] <- 1
+    huxtable::bottom_border(table)[nrow(table), ] <- 1
     
     writeLines(huxtable::to_latex(table), con)
     writeLines('', con)
     
     writeLines('', con)
-    writeLines('\\', con)
-    writeLines('', con)
+    writeLines('\\ ', con)
     writeLines('\\clearpage', con)
     writeLines('', con)
     
@@ -825,7 +832,7 @@ cprep <- function(x, fs = 1,
         }
       }
       
-      writeLines('', con)
+      writeLines('\\ ', con)
       writeLines('\\clearpage', con)
       writeLines('', con)
       
@@ -851,6 +858,7 @@ cprep <- function(x, fs = 1,
       writeLines('```', con)
       writeLines('', con)
 
+      writeLines('\\ ', con)
       writeLines('\\clearpage', con)
       writeLines('', con)
       
@@ -913,6 +921,7 @@ cprep <- function(x, fs = 1,
       writeLines(huxtable::to_latex(table), con)
       writeLines('', con)
 
+      writeLines('\\ ', con)
       writeLines('\\clearpage', con)
       writeLines('', con)
       
@@ -948,8 +957,7 @@ cprep <- function(x, fs = 1,
       writeLines('', con)
       
       writeLines('', con)
-      writeLines('\\', con)
-      writeLines('', con)
+      writeLines('\\ ', con)
       writeLines('\\clearpage', con)
       writeLines('', con)
       

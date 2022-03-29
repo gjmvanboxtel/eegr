@@ -16,6 +16,7 @@
 # 20220315  GvB           changed round() to mround(), bugfix in
 #                         randsample(), catch errors in RANSAC, 
 #                         bugfix cor_dev, corMed, rcorr, ransac_frac
+# 20220329  GvB           bugfix return variables if ransac not performed
 #---------------------------------------------------------------------------------------------------------------------
 
 #' noisysensors
@@ -414,10 +415,12 @@ noisysensors <- function(x, fs = 1, sensors = setdiff(colnames(x), "t"),
         ransac_frac <- NA
       }
     }, silent = TRUE)
-    if ("try-error" %in% err) {
+    if ("try-error" %in% class(err)) {
       ransacPerformed <- FALSE
     }
-  } else {
+  } 
+  # either not performed or exited with error
+  if (!ransacPerformed) {
     rsens <- sfrac <- ubtime <- ransacthr <- rwin <- rss <- corrT <- ransac_frac <- NA
     noisyRansac <- integer(0)
   }
