@@ -13,6 +13,7 @@
 #
 # Version history:
 # 20210101  GvB           Initial setup v0.3-0
+# 20220511  GvB           use inherits() instead of class(res)
 #---------------------------------------------------------------------------------------------------------------------
 
 #' Select Data
@@ -78,7 +79,7 @@ selectdata <- function(ctd_obj, seconds = NULL, samples = NULL, signals = NULL,
     }
     expr <- gsub('t', 'ctd_obj[, "t"]', seconds)
     res <- try(smp <- eval(parse(text = expr)))
-    if (class(res) == "try-error") {
+    if (inherits(res, "try-error")) {
       stop('seconds contains an invalid expression')
     }
   }

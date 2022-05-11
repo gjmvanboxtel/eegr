@@ -18,7 +18,8 @@
 # Version history:
 # 20160622    GvB           initial version
 # 20190912    GvB           version for eegr v0.1.0
-#---------------------------------------------------------------------------------------------------------------------
+# 20220511    GvB           use inherits() instead of class(type/sens)
+#------------------------------------------------------------------------------
 
 #' Read Sensor Locations
 #'
@@ -140,7 +141,7 @@ readSensorLocs <- function (source = 'EEGlocations',
   # the file type from the file name extension
     if (!missing(type) && !is.null(type)) {
       type <- try(match.arg(type), silent = TRUE)
-      if (class(type) == "try-error") {
+      if (inherits(type, "try-error")) {
         stop (paste("invalid 'type' value:", type))
       }
       if (type == 'custom' && (missing(format) || is.null(format))) {
@@ -373,7 +374,7 @@ readSensorLocs <- function (source = 'EEGlocations',
     
     # Try to read the file and make the elecs data frame
     sens <- try(utils::read.table(source, stringsAsFactors=FALSE, skip=skipl), silent = TRUE)
-    if (class(sens) == "try-error") {
+    if (inherits(sens, "try-error")) {
       stop (paste("unable to read sensor locations file", source));
     }
     
