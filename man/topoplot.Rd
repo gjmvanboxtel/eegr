@@ -12,6 +12,7 @@ topoplot(
   plot = c("sensorlocs", "legend"),
   col = (grDevices::colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F",
     "yellow", "#FF7F00", "red", "#7F0000")))(100),
+  fmt = "\%+f",
   xlab = "",
   ylab = "",
   main = "",
@@ -42,6 +43,10 @@ of the above. Default: \code{c("sensorlocs", "Legend")}.}
 Matlab), interpolated using \code{\link[grDevices]{colorRampPalette}}
 using 100 levels.}
 
+\item{fmt}{format statement, specified as a character value, passed to sprint
+to format the labels of the legend. See \code{link{sprintf}} for further
+detail. Default: "\%+f".}
+
 \item{xlab, ylab, main}{labels passed too plotting function. Default: "".}
 
 \item{...}{Additional parameters passed to the plotting function.}
@@ -54,7 +59,8 @@ A list with 4 components, returned invisibly:
   \item{z}{matrix of fitted z-values, dimensions 400 x 400. The fitted value
   at an sensor location with coordinates x2d and y2d can be found at
   \code{z[x2d, y2d]}.}
-  \item{zlim}{range of z-values used in the interpolation} }
+  \item{zlim}{range of z-values used in the interpolation}
+ }
 }
 \description{
 Draw a topographical plot of EEG data using spherical spline interpolation.

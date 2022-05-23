@@ -64,6 +64,7 @@ frd <- function (x, ...) UseMethod ("frd", x)
 #'   does not have column names, the columns will be named \code{S1 ... Snpts}.
 #'
 #' @examples
+#' # coming up
 #' 
 #' @rdname frd
 #' @export

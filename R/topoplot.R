@@ -15,7 +15,8 @@
 # Version history:
 # 20140212    GvB           Initial setup
 # 20190918    GvB           version for eegr v0.1.0
-# 20210602    GvB           use Akime spherical splines
+# 20210602    GvB           use Akima spherical splines
+# 20220523    GvB           add fmt parameter for legend
 #---------------------------------------------------------------------------------------------------------------------
 
 #' Topographic Plot
@@ -54,6 +55,9 @@
 #' @param col color palette used for the map. Default: jet colors (as in
 #'   Matlab), interpolated using \code{\link[grDevices]{colorRampPalette}}
 #'   using 100 levels.
+#' @param fmt format statement, specified as a character value, passed to sprint
+#'   to format the labels of the legend. See \code{link{sprintf}} for further
+#'   detail. Default: "\%+f".
 #' @param xlab,ylab,main labels passed too plotting function. Default: "".
 #' @param ... Additional parameters passed to the plotting function.
 #'
@@ -64,7 +68,8 @@
 #'   \item{z}{matrix of fitted z-values, dimensions 400 x 400. The fitted value
 #'   at an sensor location with coordinates x2d and y2d can be found at
 #'   \code{z[x2d, y2d]}.}
-#'   \item{zlim}{range of z-values used in the interpolation} }
+#'   \item{zlim}{range of z-values used in the interpolation}
+#'  }
 #'
 #' @examples
 #' data("EEGdata")
@@ -108,7 +113,7 @@ topoplot <- function (x, sl, res = 200, scale = "auto",
                                                           "#7FFF7F", "yellow",
                                                           "#FF7F00", "red",
                                                           "#7F0000"))(100),
-                      xlab = "", ylab = "", main = "", ...) {
+                      fmt = "%+f", xlab = "", ylab = "", main = "", ...) {
   
   # parameter checking
   snames <- names(x)
@@ -136,6 +141,9 @@ topoplot <- function (x, sl, res = 200, scale = "auto",
     }
   } else {
     stop('scale must be "auto" or a numeric vector of length 2')
+  }
+  if (!is.character(fmt) || substr(fmt, 1, 1) != "%") {
+    stop("fmt must be a character string beginning with '%'")
   }
   plot <- match.arg(plot, 
                     c("sensorlocs", "legend", "contour", "labels", "all"),
@@ -216,7 +224,7 @@ topoplot <- function (x, sl, res = 200, scale = "auto",
     plotrix::color.legend(xl = usr[2], yb = usr[3] + 0.2,
                           xr = usr[2] + 0.2, yt = usr[4] - 0.2,
                           rect.col = col, gradient="y", align="rb",
-                          legend = sprintf("%+2.0f", seq(zlim[1], zlim[2],
+                          legend = sprintf(fmt, seq(zlim[1], zlim[2],
                                                          length = 5))
     )
     # # tick marks

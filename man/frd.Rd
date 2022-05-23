@@ -110,6 +110,7 @@ Methods exist to print, summarize, and plot the data.
 # coming up
 f <- 1
 
+# coming up
 
 }
 \author{

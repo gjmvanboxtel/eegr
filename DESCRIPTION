@@ -11,6 +11,6 @@ Encoding: UTF-8
 Depends: R (>= 3.5)
 Remotes: gjmvanboxtel/eegr
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Imports: gsignal, stats, numbers, graphics, plotrix, utils, mmap, akima, grDevices, pracma, multitaper,
          rmarkdown, desc, huxtable, MASS
