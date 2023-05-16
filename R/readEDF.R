@@ -21,7 +21,7 @@
 # 20120207  GvB     Original version
 # 20190701  GvB     complete overhaul for eegr v0.1.0
 # 20201104  GvB     link to gsignal instead of signal package
-# 20230516  GvB     bugfixes in calculating record size
+# 20230516  GvB     bugfixes in calculating record size and up/downsampling
 #
 #-----------------------------------------------------------------------------------------------
 
@@ -400,8 +400,8 @@ readEDF <- function (file, records = "all", signals = "all",
     mtx <- matrix(0, nrow = newf * duration * length(records), ncol = length(signals))
     col <- 1
     for (s in signals) {
-      if (freq[s] != newf) mtx[, col] <- gsignal::resample(dat[[s]], newf, freq[s])
-      else mtx[, col] <- dat[[s]]
+      if (freq[s] != newf) mtx[, col] <- gsignal::resample(as.vector(dat[[s]]), newf, freq[s])
+      else mtx[, col] <- as.vector(dat[[s]])
       col <- col + 1
     }
     ctd <- ctd(mtx, newf)
