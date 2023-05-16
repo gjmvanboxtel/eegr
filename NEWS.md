@@ -1,5 +1,5 @@
 # eegr 0.3-2
-- date: 20220523
+- date: 20230516
 - added trd objects and methods
 - added mutitaper spectral estimation: mtspec(), mtchan(), mtfft()
 - added cleanline(), removetrend(), ssinterp(), unusablesensors(),
@@ -7,6 +7,7 @@
 - added 'ref'' attribute to ctd object
 - used inherits() instead of class()
 - added fmt statement to topoplot to format legend labels
+- bugfixes in readEDF()
 
 ---
 

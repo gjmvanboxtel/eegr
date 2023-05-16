@@ -20,7 +20,8 @@
 # Version history:
 # 20120207  GvB     Original version
 # 20190701  GvB     complete overhaul for eegr v0.1.0
-# 20201104  GvB     lik to gsignal instead of signal package
+# 20201104  GvB     link to gsignal instead of signal package
+# 20230516  GvB     bugfixes in calculating record size
 #
 #-----------------------------------------------------------------------------------------------
 
@@ -257,8 +258,8 @@ readEDF <- function (file, records = "all", signals = "all",
   # no records or no signals are requested
   if (missing(records) || is.null(records)  || trim.spaces(records) == 'all') records <- seq_len(nrec)
   if (missing(signals) || is.null(signals) || trim.spaces(signals) == 'all') signals <- seq_len(ns)
-  if (is.na(records) || length(records) == 0 || (length(records) == 1 && records == 0) ||
-      is.na(signals) || length(signals) == 0 || (length(signals) == 1 && signals == 0)) {
+  if (length(records) == 0 || (length(records) == 1 && (is.na(records) || records == 0)) ||
+      length(signals) == 0 || (length(signals) == 1 && (is.na(signals) || signals == 0))) {
     close(fp)
     return(head)
   }
