@@ -53,7 +53,7 @@ changefs <- function(ctd_obj, new_fs) {
   
   # compute p and q
   old_fs <- eegr::fs(ctd_obj)
-  pq <- numbers::contFrac(new_fs / old_fs)$rat
+  pq <- numbers::contfrac(new_fs / old_fs)$rat
 
   # resample and make it a ctd object
   y <- gsignal::resample(ctd_obj, pq[1], pq[2])
